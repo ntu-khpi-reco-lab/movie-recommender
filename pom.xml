@@ -23,6 +23,7 @@
         <module>crawler</module>
         <module>reco-service</module>
         <module>api-gateway</module>
+        <module>examples</module>
     </modules>
 
     <!-- Dependency Management -->
