@@ -1,3 +1,5 @@
+package com.movie.recommender.crawler;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
