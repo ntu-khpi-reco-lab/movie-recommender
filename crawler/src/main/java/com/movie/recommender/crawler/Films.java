@@ -14,7 +14,7 @@ import java.util.List;
 
 public class Films {
     private static final Logger logger = LoggerFactory.getLogger(Films.class);
-    private static final String TOKEN = "Bearer YOUR_TOKEN";
+    private static final String TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMTI3NGFmYTRlNTUyMjRjYzRlN2Q0NmNlMTNkOTZjOSIsInN1YiI6IjVkNmZhMWZmNzdjMDFmMDAxMDU5NzQ4OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.lbpgyXlOXwrbY0mUmP-zQpNAMCw_h-oaudAJB6Cn5c8";
     private final int pages;
     private List<JSONObject> films;
     private List<JSONObject> genres;
