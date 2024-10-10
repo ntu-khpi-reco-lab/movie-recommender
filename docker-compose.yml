@@ -1,0 +1,7 @@
+services:
+  user-service:
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    ports:
+      - 8080:8080
