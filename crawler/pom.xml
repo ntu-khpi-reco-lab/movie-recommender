@@ -16,8 +16,18 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io/</url>
+        </repository>
+    </repositories>
     <dependencies>
+        <dependency>
+            <groupId>io.github.hamawhitegg</groupId>
+            <artifactId>serpapi-client</artifactId>
+            <version>0.1.7</version>
+        </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
@@ -48,6 +58,7 @@
             <artifactId>mongodb-driver-sync</artifactId>
             <version>4.9.0</version> <!-- Use a stable and compatible version -->
         </dependency>
+
     </dependencies>
 
 </project>
