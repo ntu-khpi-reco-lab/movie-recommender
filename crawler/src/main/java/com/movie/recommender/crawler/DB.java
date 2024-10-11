@@ -23,7 +23,7 @@ public class DB {
         ConnectionString connectionString = new ConnectionString("mongodb://localhost:27017/testDB");
         MongoClient mongoClient = MongoClients.create(connectionString);
         MongoDatabase database = mongoClient.getDatabase("testDB");
-        return database.getCollection(database);
+        return database.getCollection(String.valueOf(database));
     }
 
     public static void fillDB() {
