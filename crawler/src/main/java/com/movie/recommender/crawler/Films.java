@@ -6,15 +6,12 @@ import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.google.gson.JsonElement;
-
 
 import java.io.IOException;
 
 public class Films {
     private static final String TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMTI3NGFmYTRlNTUyMjRjYzRlN2Q0NmNlMTNkOTZjOSIsInN1YiI6IjVkNmZhMWZmNzdjMDFmMDAxMDU5NzQ4OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.lbpgyXlOXwrbY0mUmP-zQpNAMCw_h-oaudAJB6Cn5c8";
+    private static String popular_movies_url = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&page=";
     private final int pages;
     public JsonArray film_results_array = new JsonArray();
     public JsonObject film_results;
@@ -25,11 +22,11 @@ public class Films {
         fetchGenres();
     }
 
-    private JsonArray fetchData(int page) {
+    private JsonArray fetchData(int page,String question_url) {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&page="+page)
+                .url(question_url+page)
                 .get()
                 .addHeader("accept", "application/json")
                 .addHeader("Authorization", TOKEN)
@@ -51,10 +48,11 @@ public class Films {
         return result;
     }
 
+
     private void fetchDataForPages(){
 
         for (int i = 1; i < pages; i++) {
-            this.film_results_array.addAll(fetchData(i));
+            this.film_results_array.addAll(fetchData(i,popular_movies_url));
         }
     }
 
