@@ -7,13 +7,16 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+
+
 public class Main {
+    static String CONNECTION_PATH = "mongodb://localhost:27017" ;
     public static void main(String[] args) {
         // Create a Gson instance to handle JSON serialization and deserialization
         Gson gson = new Gson();
 
         // Connect to MongoDB using the connection string (includes user credentials and database authentication)
-        try (MongoClient mongoClient = MongoClients.create("mongodb://user:pass@localhost:27017/?authSource=admin")) {
+        try (MongoClient mongoClient = MongoClients.create(CONNECTION_PATH)) {
             System.out.println("Connected to MongoDB!");
 
             // Get the 'test' database (if it doesn't exist, MongoDB will create it when we insert a document)

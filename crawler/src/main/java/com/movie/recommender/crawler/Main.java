@@ -6,5 +6,7 @@ public class Main {
         System.out.println(films.film_results_array);
         films.fetchGenres();
         System.out.println(films.genres);
+        DB db = new DB();
+        db.dbConnect("test");
     }
 }
