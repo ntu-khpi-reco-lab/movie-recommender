@@ -23,6 +23,7 @@
         <module>crawler</module>
         <module>reco-service</module>
         <module>api-gateway</module>
+        <module>examples</module>
     </modules>
 
     <!-- Dependency Management -->
@@ -51,13 +52,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
-            </plugin>
-
-            <!-- Spring Boot Maven Plugin -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
             </plugin>
         </plugins>
     </build>
