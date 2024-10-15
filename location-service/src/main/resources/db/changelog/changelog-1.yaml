@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-location-table
+      author: MykytaKa
+      changes:
+        - sqlFile:
+            path: ../migrations/V1__Create_location_table.sql
+            relativeToChangelogFile: true
