@@ -34,20 +34,7 @@ public class DB {
         }
     }
 
-    public static void makeDBFiller(List<String> film_names, List<String> location ) {
 
-
-        String language = "en";
-        String search_region = "us";
-        for (int i = 0; i < location.size(); i++){
-            for (int k = 0; k < film_names.size(); k++){
-                SerpApiShowtimes showtimes = new SerpApiShowtimes(location.get(i), language, search_region, film_names.get(k));
-                showtimes.fetchData();
-
-            }
-        }
-
-    }
 
     public static void fillDB(MongoCollection<Document> collection, JSONObject jsonObject ) {
 
