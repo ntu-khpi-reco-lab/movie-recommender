@@ -1,90 +1,110 @@
 package com.movie.recommender.crawler;
+import com.google.gson.*;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Films {
-    private static final Logger logger = LoggerFactory.getLogger(Films.class);
     private static final String TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMTI3NGFmYTRlNTUyMjRjYzRlN2Q0NmNlMTNkOTZjOSIsInN1YiI6IjVkNmZhMWZmNzdjMDFmMDAxMDU5NzQ4OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.lbpgyXlOXwrbY0mUmP-zQpNAMCw_h-oaudAJB6Cn5c8";
+    private static String onging_movies_url = "https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=";
+    private static String popular_movies_url = "https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&page=";
     private final int pages;
-    private List<JSONObject> films;
-    private List<JSONObject> genres;
-
+    public JsonArray film_results_array = new JsonArray();
+    public JsonArray ongoing_film_results_array = new JsonArray();
+    public JsonObject film_results;
+    public JsonArray genres;
     public Films(int pages) {
         this.pages = pages;
-        this.films = new ArrayList<>();
-        this.genres = new ArrayList<>();
-        fetchData();
+        fetchDataForPages();
+        fetchOngoingDataForPages();
         fetchGenres();
     }
 
-    private void fetchData() {
-        logger.info("Загрузка фильмов, страниц: {}", this.pages);
-        for (int i = 1; i <= pages; i++) {
-            try {
-                URL url = new URL("https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&page=" + i);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("Authorization", TOKEN);
-                connection.setRequestProperty("accept", "application/json");
+    private JsonArray fetchData(int page,String question_url) {
+        OkHttpClient client = new OkHttpClient();
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String inputLine;
-                StringBuilder content = new StringBuilder();
-                while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
-                }
-                in.close();
+        Request request = new Request.Builder()
+                .url(question_url+page)
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("Authorization", TOKEN)
+                .build();
 
-                JSONObject response = new JSONObject(content.toString());
-                JSONArray results = response.getJSONArray("results");
-                for (int j = 0; j < results.length(); j++) {
-                    films.add(results.getJSONObject(j));
-                }
 
-                connection.disconnect();
-            } catch (Exception e) {
-                logger.error("Ошибка при загрузке данных для страницы {}", i, e);
+        JsonArray result = new JsonArray();
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                String jsonData = response.body().string();
+                this.film_results = JsonParser.parseString(jsonData).getAsJsonObject();
+                result = film_results.getAsJsonArray("results");
+            } else {
+                System.out.println("Error: " + response.code());
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    private void fetchDataForPages(){
+
+        for (int i = 1; i < pages+1; i++) {
+            this.film_results_array.addAll(fetchData(i,popular_movies_url));
         }
     }
 
-    private void fetchGenres() {
-        logger.info("Загрузка жанров");
-        try {
-            URL url = new URL("https://api.themoviedb.org/3/genre/movie/list");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", TOKEN);
-            connection.setRequestProperty("accept", "application/json");
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuilder content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
+    private void fetchOngoingDataForPages(){
 
-            JSONObject response = new JSONObject(content.toString());
-            genres.add(response);
-
-            connection.disconnect();
-        } catch (Exception e) {
-            logger.error("Ошибка при загрузке жанров", e);
+        for (int i = 1; i < pages+1; i++) {
+            this.ongoing_film_results_array.addAll(fetchData(i,onging_movies_url));
         }
     }
 
-    public List<JSONObject> getAllData() {
-        return this.films;
+
+    public void fetchGenres() {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+
+                .url("https://api.themoviedb.org/3/genre/movie/list")
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("Authorization", TOKEN)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                String jsonData = response.body().string();
+                JsonObject object = JsonParser.parseString(jsonData).getAsJsonObject();
+                this.genres = object.getAsJsonArray("genres");
+            } else {
+                System.out.println("Error: " + response.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
+
+    public static List<String> getFilmNames(JsonArray filmsArray) {
+        List<String> filmNames = new ArrayList<>();
+
+        // Loop through each film object and extract the title
+        for (JsonElement filmElement : filmsArray) {
+            JsonObject filmObject = filmElement.getAsJsonObject();
+            String title = filmObject.get("title").getAsString();
+            filmNames.add(title);
+        }
+
+        return filmNames;
+    }
+
 }
