@@ -1,4 +1,4 @@
-package com.movie.recommender.location_service;
+package com.movie.recommender.location;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
