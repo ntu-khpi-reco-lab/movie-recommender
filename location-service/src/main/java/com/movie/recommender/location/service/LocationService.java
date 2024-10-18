@@ -1,12 +1,11 @@
 package com.movie.recommender.location.service;
 
+import com.movie.recommender.location.exception.LocationNotFoundException;
 import com.movie.recommender.location.repository.LocationRepository;
 import com.movie.recommender.location.model.dto.LocationCreateDTO;
 import com.movie.recommender.location.model.dto.LocationUpdateDTO;
-import org.springframework.web.server.ResponseStatusException;
 import com.movie.recommender.location.model.entity.Location;
 import com.movie.recommender.location.model.dto.LocationDTO;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +41,11 @@ public class LocationService {
         return locationRepository.findByUserId(userId).map(LocationDTO::toDTO);
     }
 
+    @Transactional
     public LocationDTO updateLocationByUserId(Long userId, LocationUpdateDTO locationUpdateDTO) {
         log.info("Updating location by id: {}", userId);
         Location location = locationRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
+                .orElseThrow(LocationNotFoundException::new);
         log.info("Location with user id {} was found", userId);
         location.setLatitude(locationUpdateDTO.getLatitude());
         location.setLongitude(locationUpdateDTO.getLongitude());

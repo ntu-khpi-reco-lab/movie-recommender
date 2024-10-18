@@ -5,3 +5,5 @@ CREATE TABLE IF NOT EXISTS locations (
     user_id BIGINT UNIQUE NOT NULL,
     created_at TIMESTAMP NOT NULL
 );
+
+CREATE INDEX idx_user_id ON locations(user_id);

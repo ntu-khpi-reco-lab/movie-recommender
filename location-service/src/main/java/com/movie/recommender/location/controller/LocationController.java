@@ -31,33 +31,26 @@ public class LocationController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getLocationById(@PathVariable("id") Long id) {
+    public ResponseEntity<LocationDTO> getLocationById(@PathVariable("id") Long id) {
         log.info("Fetching location with ID: {}", id);
         LocationDTO location = locationService.getLocationById(id)
-                .orElseThrow(() -> {
-                    log.warn("Location with ID: {} not found", id);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found");
-                });
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
 
         log.info("Location found: {}", location);
         return ResponseEntity.ok(location);
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getLocationByUserId(@PathVariable("userId") Long userId) {
+    public ResponseEntity<LocationDTO> getLocationByUserId(@PathVariable("userId") Long userId) {
         log.info("Fetching location with user id: {}", userId);
         LocationDTO location = locationService.getLocationByUserId(userId)
-                .orElseThrow(() -> {
-                    log.warn("Location with user id: {} not found", userId);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found");
-                });
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
         log.info("Location found: {}", location);
         return ResponseEntity.ok(location);
     }
 
     @PutMapping("/users/{userId}")
-    public ResponseEntity<LocationDTO> updateLocationByUserId(
+    public ResponseEntity<LocationDTO> updateLocationForUser(
             @PathVariable("userId") Long userId,
             @RequestBody @Valid LocationUpdateDTO locationUpdateDTO) {
         log.info("Updating location for user with ID: {}", userId);

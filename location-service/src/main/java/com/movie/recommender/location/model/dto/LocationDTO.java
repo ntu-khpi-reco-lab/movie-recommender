@@ -26,8 +26,8 @@ public class LocationDTO {
     public static LocationDTO toDTO(Location location) {
         return new LocationDTO(
                 location.getId(),
-                location.getLongitude(),
                 location.getLatitude(),
+                location.getLongitude(),
                 location.getUserId(),
                 location.getCreatedAt()
         );
