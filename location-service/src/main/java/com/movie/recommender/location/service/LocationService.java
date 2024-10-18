@@ -1,10 +1,16 @@
 package com.movie.recommender.location.service;
 
-import com.movie.recommender.location.dto.LocationsDTO;
 import com.movie.recommender.location.repository.LocationRepository;
-import com.movie.recommender.location.model.entity.Locations;
-import lombok.extern.slf4j.Slf4j;
+import com.movie.recommender.location.model.dto.LocationCreateDTO;
+import com.movie.recommender.location.model.dto.LocationUpdateDTO;
+import org.springframework.web.server.ResponseStatusException;
+import com.movie.recommender.location.model.entity.Location;
+import com.movie.recommender.location.model.dto.LocationDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Optional;
 
 @Slf4j
@@ -17,15 +23,35 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
 
-    public LocationsDTO saveLocation(LocationsDTO locationDTO) {
-        log.info("Converting DTO to entity and saving location: {}", locationDTO);
-        Locations location = LocationsDTO.toEntity(locationDTO);
-        Locations savedLocation = locationRepository.save(location);
-        return LocationsDTO.toDTO(savedLocation);
+    @Transactional
+    public LocationDTO saveLocation(LocationCreateDTO locationCreateDTO) {
+        log.info("Converting DTO to entity and saving location: {}", locationCreateDTO);
+        Location location = LocationCreateDTO.toEntity(locationCreateDTO);
+        Location savedLocation = locationRepository.save(location);
+        log.info("New location {} was saved", savedLocation);
+        return LocationDTO.toDTO(savedLocation);
     }
 
-    public Optional<LocationsDTO> getLocationById(Long id) {
+    public Optional<LocationDTO> getLocationById(Long id) {
         log.info("Getting location by id: {}", id);
-        return locationRepository.findById(id).map(LocationsDTO::toDTO);
+        return locationRepository.findById(id).map(LocationDTO::toDTO);
+    }
+
+    public Optional<LocationDTO> getLocationByUserId(Long userId) {
+        log.info("Getting location by user id: {}", userId);
+        return locationRepository.findByUserId(userId).map(LocationDTO::toDTO);
+    }
+
+    public LocationDTO updateLocationByUserId(Long userId, LocationUpdateDTO locationUpdateDTO) {
+        log.info("Updating location by id: {}", userId);
+        Location location = locationRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
+        log.info("Location with user id {} was found", userId);
+        location.setLatitude(locationUpdateDTO.getLatitude());
+        location.setLongitude(locationUpdateDTO.getLongitude());
+
+        Location updatedLocation = locationRepository.save(location);
+        log.info("Location with id {} was updated", updatedLocation.getId());
+        return LocationDTO.toDTO(updatedLocation);
     }
 }

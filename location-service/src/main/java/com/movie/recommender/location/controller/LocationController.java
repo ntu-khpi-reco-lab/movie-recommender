@@ -1,14 +1,15 @@
 package com.movie.recommender.location.controller;
 
+import com.movie.recommender.location.model.dto.LocationCreateDTO;
+import com.movie.recommender.location.model.dto.LocationUpdateDTO;
 import com.movie.recommender.location.service.LocationService;
-import com.movie.recommender.location.dto.LocationsDTO;
+import org.springframework.web.server.ResponseStatusException;
+import com.movie.recommender.location.model.dto.LocationDTO;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -21,15 +22,10 @@ public class LocationController {
         this.locationService = locationService;
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> createLocation(@RequestBody @Valid LocationsDTO locationDTO) {
-        log.info("Creating location with: latitude: {}, longitude: {}, timestamp: {}, user_id {}",
-                locationDTO.getLatitude(),
-                locationDTO.getLongitude(),
-                LocalDateTime.now(),
-                locationDTO.getUser_id());
-
-        LocationsDTO savedDTOLocation = locationService.saveLocation(locationDTO);
+    @PostMapping
+    public ResponseEntity<LocationDTO> createLocation(@RequestBody @Valid LocationCreateDTO locationCreateDTO) {
+        log.info("Creating location: {}", locationCreateDTO);
+        LocationDTO savedDTOLocation = locationService.saveLocation(locationCreateDTO);
         log.info("Location created with ID: {}", savedDTOLocation.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDTOLocation);
     }
@@ -37,14 +33,36 @@ public class LocationController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getLocationById(@PathVariable("id") Long id) {
         log.info("Fetching location with ID: {}", id);
-        Optional<LocationsDTO> location = locationService.getLocationById(id);
+        LocationDTO location = locationService.getLocationById(id)
+                .orElseThrow(() -> {
+                    log.warn("Location with ID: {} not found", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found");
+                });
 
-        return location.map(loc -> {
-            log.info("Location found: {}", loc);
-            return ResponseEntity.ok(loc);
-        }).orElseGet(() -> {
-            log.warn("Location with ID: {} not found", id);
-            return ResponseEntity.notFound().build();
-        });
+        log.info("Location found: {}", location);
+        return ResponseEntity.ok(location);
+    }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<?> getLocationByUserId(@PathVariable("userId") Long userId) {
+        log.info("Fetching location with user id: {}", userId);
+        LocationDTO location = locationService.getLocationByUserId(userId)
+                .orElseThrow(() -> {
+                    log.warn("Location with user id: {} not found", userId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found");
+                });
+
+        log.info("Location found: {}", location);
+        return ResponseEntity.ok(location);
+    }
+
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<LocationDTO> updateLocationByUserId(
+            @PathVariable("userId") Long userId,
+            @RequestBody @Valid LocationUpdateDTO locationUpdateDTO) {
+        log.info("Updating location for user with ID: {}", userId);
+        LocationDTO updatedLocation = locationService.updateLocationByUserId(userId, locationUpdateDTO);
+        log.info("Location updated for user with ID: {}", userId);
+        return ResponseEntity.ok(updatedLocation);
     }
 }
