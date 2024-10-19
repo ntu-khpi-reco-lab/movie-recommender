@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
 public class LocationService {
@@ -24,34 +22,44 @@ public class LocationService {
 
     @Transactional
     public LocationDTO saveLocation(LocationCreateDTO locationCreateDTO) {
-        log.info("Converting DTO to entity and saving location: {}", locationCreateDTO);
+        log.info("Saving new location for user: {}", locationCreateDTO.getUserId());
+
         Location location = LocationCreateDTO.toEntity(locationCreateDTO);
         Location savedLocation = locationRepository.save(location);
-        log.info("New location {} was saved", savedLocation);
+
+        log.info("New location with ID {} was saved for user {}", savedLocation.getId(), locationCreateDTO.getUserId());
         return LocationDTO.toDTO(savedLocation);
     }
 
-    public Optional<LocationDTO> getLocationById(Long id) {
-        log.info("Getting location by id: {}", id);
-        return locationRepository.findById(id).map(LocationDTO::toDTO);
+    public LocationDTO getLocationById(Long id) {
+        log.info("Fetching location by ID: {}", id);
+        return locationRepository.findById(id)
+                .map(LocationDTO::toDTO)
+                .orElseThrow(() -> new LocationNotFoundException("Location not found with ID: " + id));
     }
 
-    public Optional<LocationDTO> getLocationByUserId(Long userId) {
-        log.info("Getting location by user id: {}", userId);
-        return locationRepository.findByUserId(userId).map(LocationDTO::toDTO);
+    public LocationDTO getLocationByUserId(Long userId) {
+        log.info("Fetching location for user ID: {}", userId);
+        Location location = findLocationByUserId(userId);
+        log.info("Location found for user ID: {}", userId);
+        return LocationDTO.toDTO(location);
     }
 
     @Transactional
     public LocationDTO updateLocationByUserId(Long userId, LocationUpdateDTO locationUpdateDTO) {
-        log.info("Updating location by id: {}", userId);
-        Location location = locationRepository.findByUserId(userId)
-                .orElseThrow(LocationNotFoundException::new);
-        log.info("Location with user id {} was found", userId);
+        log.info("Updating location for user ID: {}", userId);
+        Location location = findLocationByUserId(userId);
+
         location.setLatitude(locationUpdateDTO.getLatitude());
         location.setLongitude(locationUpdateDTO.getLongitude());
 
         Location updatedLocation = locationRepository.save(location);
-        log.info("Location with id {} was updated", updatedLocation.getId());
+        log.info("Location with ID {} was updated for user ID {}", updatedLocation.getId(), userId);
         return LocationDTO.toDTO(updatedLocation);
+    }
+
+    private Location findLocationByUserId(Long userId) {
+        return locationRepository.findByUserId(userId)
+                .orElseThrow(() -> new LocationNotFoundException("Location not found for user ID: " + userId));
     }
 }

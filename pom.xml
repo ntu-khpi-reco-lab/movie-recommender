@@ -11,7 +11,7 @@
     <!-- Common properties used across all modules -->
     <properties>
         <java.version>21</java.version>
-        <spring.boot.version>3.3.0</spring.boot.version>
+        <spring.boot.version>3.3.4</spring.boot.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>

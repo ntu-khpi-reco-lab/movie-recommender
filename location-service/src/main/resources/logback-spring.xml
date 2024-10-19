@@ -2,7 +2,7 @@
     <!-- Console configuration -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -11,14 +11,16 @@
         <file>logs/myapp.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] - %msg%n</pattern>
         </encoder>
     </appender>
 
+    <!-- Root logger: INFO level (will log WARN and ERROR too) -->
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
     </root>
 
+    <!-- Package-specific logger (DEBUG level for com.movie.recommender.location) -->
     <logger name="com.movie.recommender.location" level="DEBUG" />
 </configuration>

@@ -29,7 +29,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ExceptionHandler(LocationNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleLocationNotFoundException(LocationNotFoundException ex, WebRequest request) {
-        log.warn(ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("error", ex.getMessage()));
+        log.warn("Location not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("location_not_found", ex.getMessage()));
     }
 }
