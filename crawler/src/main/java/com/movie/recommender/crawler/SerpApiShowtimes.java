@@ -20,10 +20,10 @@ public class SerpApiShowtimes {
     public String language;
     public String region;
     public JsonElement showtimes_data;
+    public JsonArray showtimes_data_for_db;
     public SerpApiShowtimes( String language, String region) {
         this.language = language;
         this.region = region;
-        showtimes_data = readJsonFromFile(showtime_file_path);
     }
 
     private ZonedDateTime date_parse(String dateString){
@@ -60,7 +60,7 @@ public class SerpApiShowtimes {
         }
     }
 
-    public static JsonArray makeDBFiller(List<String> film_names, List<String> location ) {
+    public JsonArray makeDBFiller(List<String> film_names, List<String> location ) {
 
         JsonArray results = new JsonArray();
         String language = "en";
@@ -84,37 +84,11 @@ public class SerpApiShowtimes {
             }
         }
         System.out.println(results);
+        this.showtimes_data_for_db = results;
         return results;
 
 
     }
-
-    public static JsonElement readJsonFromFile(String filePath) {
-        // Create a Gson instance
-        Gson gson = new Gson();
-        JsonElement jsonElement = null;
-        try {
-            // Reading the file into a FileReader
-            FileReader reader = new FileReader(filePath);
-
-            // Parsing the JSON from the file into a JsonElement
-            jsonElement = JsonParser.parseReader(reader);
-
-            // Close the file reader
-            reader.close();
-
-            // Return the JsonElement
-            return jsonElement;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Return null if there was an issue reading the file
-        return jsonElement;
-    }
-
-
 
 
 }
