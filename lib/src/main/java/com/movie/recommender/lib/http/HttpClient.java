@@ -15,10 +15,7 @@ public class HttpClient {
 
     public HttpClient(String authToken) {
         this.client = new OkHttpClient();
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+        this.objectMapper = createObjectMapper();
         this.authToken = authToken;
     }
 
@@ -43,5 +40,13 @@ public class HttpClient {
             // Convert the response body into the specified class type
             return objectMapper.readValue(response.body().string(), tClass);
         }
+    }
+
+    // Create and configure ObjectMapper with necessary features
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
     }
 }
