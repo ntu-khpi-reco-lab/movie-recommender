@@ -17,15 +17,19 @@ public class TmdbApiClient {
     }
 
     public Optional<Movie> getMovieDetails(String movieId) {
+        String url = UrlBuilder.movieDetailsUrl(movieId);
+        return callApi(url, Movie.class);
+    }
+
+    // Helper method to handle API call
+    private <T> Optional<T> callApi(String url, Class<T> responseType) {
         try {
-            log.info("Fetching movie details for movie ID: {}", movieId);
-
-            String url = UrlBuilder.movieDetailsUrl(movieId);
-            Movie movie = httpClient.get(url, Movie.class);
-
-            return Optional.ofNullable(movie);
+            log.info("Making API request to URL: {}", url);
+            T response = httpClient.get(url, responseType);
+            log.info("Successfully fetched data from URL: {}", url);
+            return Optional.ofNullable(response);
         } catch (Exception e) {
-            log.error("Failed to fetch movie details for movie ID: {}", movieId, e);
+            log.error("Failed to fetch data from URL: {}", url, e);
             return Optional.empty();
         }
     }
