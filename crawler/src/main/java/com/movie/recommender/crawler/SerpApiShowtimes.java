@@ -17,16 +17,12 @@ public class SerpApiShowtimes {
     private static final String showtime_file_path = "crawler/src/main/java/resources/static_showtime.txt";
     private static ZonedDateTime  time_of_created_request;
     public String dateString = "2024-10-16 21:01:51 UTC";
-    public String location;
     public String language;
     public String region;
-    public String film_name;
     public JsonElement showtimes_data;
-    public SerpApiShowtimes(String location, String language, String region, String film_name) {
-        this.location = location;
+    public SerpApiShowtimes( String language, String region) {
         this.language = language;
         this.region = region;
-        this.film_name = film_name;
         showtimes_data = readJsonFromFile(showtime_file_path);
     }
 
@@ -39,10 +35,10 @@ public class SerpApiShowtimes {
 
     }
 
-    public void fetchData(){
+    public void fetchData(String location,String film_name){
         Map<String, String> parameter = new HashMap<>();
-        parameter.put("q", this.film_name + " showtimes" );
-        parameter.put("location", this.location );
+        parameter.put("q", film_name + " showtimes" );
+        parameter.put("location", location );
         parameter.put("hl", this.language);
         parameter.put("gl", this.region);
         parameter.put("api_key", API_KEY );
@@ -64,15 +60,15 @@ public class SerpApiShowtimes {
         }
     }
 
-    public static void makeDBFiller(List<String> film_names, List<String> location ) {
+    public static JsonArray makeDBFiller(List<String> film_names, List<String> location ) {
 
         JsonArray results = new JsonArray();
         String language = "en";
         String search_region = "us";
         for (int i = 0; i < location.size(); i++){
             for (int k = 0; k < film_names.size(); k++){
-                SerpApiShowtimes showtimes = new SerpApiShowtimes(location.get(i), language, search_region, film_names.get(k));
-                showtimes.fetchData();
+                SerpApiShowtimes showtimes = new SerpApiShowtimes( language, search_region );
+                showtimes.fetchData(location.get(i),film_names.get(k));
                 for (int d = 0; d < showtimes.showtimes_data.getAsJsonArray().size(); d++) {
 
                     String day = showtimes.showtimes_data.getAsJsonArray().get(d).getAsJsonObject().get("day").getAsString();
@@ -88,6 +84,7 @@ public class SerpApiShowtimes {
             }
         }
         System.out.println(results);
+        return results;
 
 
     }

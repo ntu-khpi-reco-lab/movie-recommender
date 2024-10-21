@@ -34,29 +34,14 @@ public class DB {
         }
     }
 
-
-
-    public static void fillDB(MongoCollection<Document> collection, JSONObject jsonObject ) {
+    public  void fillDB(String jsstring ) {
 
         // Convert the Person object to a MongoDB Document using Gson (JSON to BSON conversion)
-        Document document = Document.parse(String.valueOf(jsonObject));
+        Document document = Document.parse(jsstring);
 
         // Insert the document into the 'testCollection' collection
-        collection.insertOne(document);
+        this.collection.insertOne(document);
         System.out.println("Document inserted successfully!");
 
-        // Retrieve the first document where the name field equals 'John'
-        Document myDoc = collection.find(new Document("name", "John")).first();
-
-        // If a document is found, deserialize it back to a Person object using Gson
-        if (myDoc != null) {
-
-        } else {
-            // If no document is found, print a message
-            System.out.println("No document found!");
-        }
     }
-
-
-
 }

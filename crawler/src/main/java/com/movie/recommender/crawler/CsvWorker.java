@@ -10,7 +10,8 @@ import org.json.JSONObject;
 import java.io.File;
 
 public class CsvWorker {
-    public static String csvLoader(String filePath, String input){
+
+    public String csvLoader(String filePath, String input){
         String jsonString;
         JSONObject jsonObject;
 
@@ -25,7 +26,7 @@ public class CsvWorker {
 
             // Step 4: Create a new CSV file using
             //  the package java.io.File
-            File file = new File("Test.csv");
+            File file = new File(filePath);
 
             // Step 5: Produce a comma delimited text from
             // the JSONArray of JSONObjects
