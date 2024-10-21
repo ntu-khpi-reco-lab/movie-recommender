@@ -24,6 +24,8 @@
         <module>reco-service</module>
         <module>api-gateway</module>
         <module>examples</module>
+        <module>lib</module>
+        <module>common</module>
     </modules>
 
     <!-- Dependency Management -->
