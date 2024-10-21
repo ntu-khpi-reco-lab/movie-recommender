@@ -5,7 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TmdbApiClientTest {
     private TmdbApiClient tmdbApiClient;
@@ -19,14 +22,14 @@ public class TmdbApiClientTest {
     @DisplayName("Test fetching movie details and validating the title")
     public void testGetMovieDetails() {
         // Fetch movie details for movie ID 671 (Harry Potter and the Philosopher's Stone)
-        Movie movieDetails = tmdbApiClient.getMovieDetails("671");
+        Optional<Movie> movieDetails = tmdbApiClient.getMovieDetails("671");
 
         // Assert that the movie details are not null
-        assert movieDetails != null;
+        assertTrue("Movie details should not be null", movieDetails.isPresent());
 
         // Assert that the movie title is "Harry Potter and the Philosopher's Stone"
         assertEquals("Movie title should be 'Harry Potter and the Philosopher's Stone'",
                 "Harry Potter and the Philosopher's Stone",
-                movieDetails.getTitle());
+                movieDetails.get().getTitle());
     }
 }
