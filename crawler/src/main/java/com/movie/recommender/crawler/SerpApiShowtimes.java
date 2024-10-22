@@ -75,6 +75,7 @@ public class SerpApiShowtimes {
 
                     for (int theater = 0; theater < day_data.getAsJsonArray("theaters").size(); theater++){
                         day_data.getAsJsonArray("theaters").get(theater).getAsJsonObject().addProperty("day", time_of_created_request.plusDays(d).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                        day_data.getAsJsonArray("theaters").get(theater).getAsJsonObject().addProperty("movie", film_names.get(k));
                         results.add(day_data.getAsJsonArray("theaters").get(theater));
                     }
 

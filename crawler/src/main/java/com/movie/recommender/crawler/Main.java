@@ -28,7 +28,8 @@ public class Main {
         CsvWorker csv = new CsvWorker();
         csv.csvLoader("crawler/src/main/java/resources/tbd_data.csv", films.film_results_array.toString());
 
-        DB db = new DB();  // Initialize the MongoDB wrapper
+
+        DB db = new DB();
 
         //db.insertJsonListToCollection("filmsCollection", films.film_results_array);
         //db.insertJsonListToCollection("showtimesCollection", showtimes_db_filler);
