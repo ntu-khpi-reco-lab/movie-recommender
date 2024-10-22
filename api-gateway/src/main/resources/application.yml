@@ -1,0 +1,6 @@
+server:
+  port: 8080 # API Gateway running on port 8080
+
+spring:
+  application:
+    name: api-gateway
