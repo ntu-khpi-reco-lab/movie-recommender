@@ -34,6 +34,13 @@ public class Movie {
     private int voteCount;
 
     // Inner Classes for nested objects
+    @Data
+    public static class MovieList {
+        private List<Movie> results;
+        private int page;
+        private int totalResults;
+        private int totalPages;
+    }
 
     @Data
     public static class Collection {

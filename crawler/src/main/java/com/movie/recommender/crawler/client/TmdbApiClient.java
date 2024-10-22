@@ -42,4 +42,14 @@ public class TmdbApiClient {
         }
         return apiKey;
     }
+
+    public Optional<Movie.MovieList> getNowPlayingMovies() {
+        String url = UrlBuilder.nowPlayingMoviesUrl();
+        return callApi(url, Movie.MovieList.class);  // MovieList - це клас для списку фільмів
+    }
+
+    public Optional<MovieCredits> getMovieCredits(String movieId) {
+        String url = UrlBuilder.movieCreditsUrl(movieId);
+        return callApi(url, MovieCredits.class);  // MovieCredits - це клас для кредитів фільму
+    }
 }
