@@ -60,4 +60,5 @@ public class TmdbApiClient {
         String url = UrlBuilder.movieKeywordsUrl(movieId);
         return callApi(url, MovieKeywords.class);
     }
+
 }

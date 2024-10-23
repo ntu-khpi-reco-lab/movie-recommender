@@ -33,7 +33,7 @@ public class Movie {
     private double voteAverage;
     private int voteCount;
 
-    // Inner Classes for nested objects
+
     @Data
     public static class MovieList {
         private List<Movie> results;
@@ -85,6 +85,7 @@ public class Movie {
         private String creditId;
         private int order;
     }
+
 
     @Data
     public static class Collection {
