@@ -1,5 +1,4 @@
 package com.movie.recommender.crawler.client;
-
 import com.movie.recommender.common.model.Movie;
 import com.movie.recommender.common.model.Movie.MovieList;
 import com.movie.recommender.common.model.Movie.MovieCredits;
