@@ -1,15 +1,17 @@
 package com.movie.recommender.crawler.client;
 import com.movie.recommender.common.model.Movie;
+
 import com.movie.recommender.common.model.Movie.MovieList;
 import com.movie.recommender.common.model.Movie.MovieCredits;
 import com.movie.recommender.common.model.Movie.MovieKeywords;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
+
 
 
 public class TmdbApiClientTest {
@@ -33,6 +35,7 @@ public class TmdbApiClientTest {
         assertEquals("Harry Potter and the Philosopher's Stone", movieDetails.get().getTitle(),
                 "Movie title should be 'Harry Potter and the Philosopher's Stone'");
     }
+
 
     @Test
     @DisplayName("Test fetching now playing movies")
