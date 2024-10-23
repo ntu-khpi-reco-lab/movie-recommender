@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Slf4j
 public class TmdbApiClient {
-    public static final String API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ODg1YzczNjY0ZjNmOWQzZTJlNmE0MTk2Mzk4OThhYiIsIm5iZiI6MTcyOTcwODA5NS45MjMxMDgsInN1YiI6IjY3MDJmOGY5YzlhMTBkNDZlYTdkNjUyNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cSLo3PN-_umG3-OByVxMFB29Aba6lotHDftSf1bn57U";
+    public static final String API_KEY = getApiKey();
 
     private final HttpClient httpClient;
 
@@ -48,12 +48,12 @@ public class TmdbApiClient {
 
     public Optional<MovieList> getNowPlayingMovies() {
         String url = UrlBuilder.nowPlayingMoviesUrl();
-        return callApi(url, MovieList.class);  // MovieList - це клас для списку фільмів
+        return callApi(url, MovieList.class);
     }
 
     public Optional<MovieCredits> getMovieCredits(String movieId) {
         String url = UrlBuilder.movieCreditsUrl(movieId);
-        return callApi(url, MovieCredits.class);  // MovieCredits - це клас для кредитів фільму
+        return callApi(url, MovieCredits.class);
     }
 
     public Optional<MovieKeywords> getMovieKeywords(String movieId) {
