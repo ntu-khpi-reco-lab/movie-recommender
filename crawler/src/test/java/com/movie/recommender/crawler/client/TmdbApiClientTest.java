@@ -1,9 +1,10 @@
 package com.movie.recommender.crawler.client;
 import com.movie.recommender.common.model.Movie;
 
-import com.movie.recommender.common.model.Movie.MovieList;
-import com.movie.recommender.common.model.Movie.MovieCredits;
-import com.movie.recommender.common.model.Movie.MovieKeywords;
+import com.movie.recommender.common.model.MovieList;
+
+import com.movie.recommender.common.model.MovieCredits;
+import com.movie.recommender.common.model.MovieKeywords;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

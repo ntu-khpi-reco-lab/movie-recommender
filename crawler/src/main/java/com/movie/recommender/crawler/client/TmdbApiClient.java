@@ -1,9 +1,9 @@
 package com.movie.recommender.crawler.client;
 
 import com.movie.recommender.common.model.Movie;
-import com.movie.recommender.common.model.Movie.MovieList;
-import com.movie.recommender.common.model.Movie.MovieCredits;
-import com.movie.recommender.common.model.Movie.MovieKeywords;
+import com.movie.recommender.common.model.MovieList;
+import com.movie.recommender.common.model.MovieCredits;
+import com.movie.recommender.common.model.MovieKeywords;
 import com.movie.recommender.lib.http.HttpClient;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +22,21 @@ public class TmdbApiClient {
     public Optional<Movie> getMovieDetails(String movieId) {
         String url = UrlBuilder.movieDetailsUrl(movieId);
         return callApi(url, Movie.class);
+    }
+
+    public Optional<MovieList> getNowPlayingMovies() {
+        String url = UrlBuilder.nowPlayingMoviesUrl();
+        return callApi(url, MovieList.class);
+    }
+
+    public Optional<MovieCredits> getMovieCredits(String movieId) {
+        String url = UrlBuilder.movieCreditsUrl(movieId);
+        return callApi(url, MovieCredits.class);
+    }
+
+    public Optional<MovieKeywords> getMovieKeywords(String movieId) {
+        String url = UrlBuilder.movieKeywordsUrl(movieId);
+        return callApi(url, MovieKeywords.class);
     }
 
     // Helper method to handle API call
@@ -44,21 +59,6 @@ public class TmdbApiClient {
             throw new IllegalStateException("TMDB_API_KEY environment variable is not set.");
         }
         return apiKey;
-    }
-
-    public Optional<MovieList> getNowPlayingMovies() {
-        String url = UrlBuilder.nowPlayingMoviesUrl();
-        return callApi(url, MovieList.class);
-    }
-
-    public Optional<MovieCredits> getMovieCredits(String movieId) {
-        String url = UrlBuilder.movieCreditsUrl(movieId);
-        return callApi(url, MovieCredits.class);
-    }
-
-    public Optional<MovieKeywords> getMovieKeywords(String movieId) {
-        String url = UrlBuilder.movieKeywordsUrl(movieId);
-        return callApi(url, MovieKeywords.class);
     }
 
 }
