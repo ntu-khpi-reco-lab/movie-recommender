@@ -42,6 +42,27 @@ public class HttpClient {
         }
     }
 
+    public <T> T getForSerpApi(String url, Class<T> tClass) throws IOException {
+        Request.Builder requestBuilder = new Request.Builder().url(url);
+
+        // Add Authorization header if auth token is present
+        if (authToken != null) url += "?auth_token=" + authToken;
+
+        Request request = requestBuilder.build();
+
+        // Make the HTTP GET request
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected response code: " + response.code());
+            }
+
+            assert response.body() != null;
+
+            // Convert the response body into the specified class type
+            return objectMapper.readValue(response.body().string(), tClass);
+        }
+    }
+
     // Create and configure ObjectMapper with necessary features
     private ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();

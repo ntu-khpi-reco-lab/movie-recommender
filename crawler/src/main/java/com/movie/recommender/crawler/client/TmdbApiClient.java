@@ -43,7 +43,7 @@ public class TmdbApiClient {
     private <T> Optional<T> callApi(String url, Class<T> responseType) {
         try {
             log.info("Making API request to URL: {}", url);
-            T response = httpClient.get(url, responseType);
+            T response = httpClient.getForSerpApi(url, responseType);
             log.info("Successfully fetched data from URL: {}", url);
             return Optional.ofNullable(response);
         } catch (Exception e) {
