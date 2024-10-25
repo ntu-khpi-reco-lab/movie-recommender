@@ -11,7 +11,7 @@ public class SerpApiClient {
     private final HttpClient httpClient;
 
     public SerpApiClient() {
-        this.httpClient = new HttpClient("9dc14c3ae6901ba9fbc7e0257594425557b53a2399fda39f89ec67c074df9a56");
+        this.httpClient = new HttpClient(getApiKey());
     }
 
     public Optional<MovieShowtimesResponse > getMovieShowtimes(String movieName, String location, String language) {
