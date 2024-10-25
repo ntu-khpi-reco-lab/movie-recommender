@@ -1,17 +1,14 @@
 package com.movie.recommender.crawler.client;
 
 import com.movie.recommender.common.model.MovieShowtimesResponse;
-import com.movie.recommender.common.model.MovieShowtimesResponse.Showtime;
-import com.movie.recommender.common.model.MovieShowtimesResponse.Theater;
 import com.movie.recommender.common.model.MovieShowtimesResponse.SearchMetadata;
-
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-import java.util.List;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,6 +35,4 @@ public class SerpApiClientTest {
         assertNotNull(metadata.getStatus(), "Search metadata status should not be null");
 
     }
-
-
 }
