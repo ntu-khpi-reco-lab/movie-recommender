@@ -1,7 +1,6 @@
 package com.movie.recommender.crawler.client;
 
 import com.movie.recommender.common.model.MovieShowtimesResponse;
-import com.movie.recommender.common.model.Showtimes;
 import com.movie.recommender.lib.http.HttpClient;
 import lombok.extern.slf4j.Slf4j;
 import java.util.Optional;
@@ -12,7 +11,7 @@ public class SerpApiClient {
     private final HttpClient httpClient;
 
     public SerpApiClient() {
-        this.httpClient = new HttpClient(getApiKey());
+        this.httpClient = new HttpClient("9dc14c3ae6901ba9fbc7e0257594425557b53a2399fda39f89ec67c074df9a56");
     }
 
     public Optional<MovieShowtimesResponse > getMovieShowtimes(String movieName, String location, String language) {
@@ -24,7 +23,7 @@ public class SerpApiClient {
     private <T> Optional<T> callApi(String url, Class<T> responseType) {
         try {
             log.info("Making API request to URL: {}", url);
-            T response = httpClient.get(url, responseType);
+            T response = httpClient.getForSerpApi(url, responseType);
             log.info("Successfully fetched data from URL: {}", url);
             return Optional.ofNullable(response);
         } catch (Exception e) {

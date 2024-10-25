@@ -42,11 +42,11 @@ public class HttpClient {
         }
     }
 
+    //I can t be surely that I can make this manipuation with url
     public <T> T getForSerpApi(String url, Class<T> tClass) throws IOException {
-        Request.Builder requestBuilder = new Request.Builder().url(url);
 
-        // Add Authorization header if auth token is present
-        if (authToken != null) url += "?auth_token=" + authToken;
+        if (authToken != null) url += "&api_key=" + authToken;
+        Request.Builder requestBuilder = new Request.Builder().url(url);
 
         Request request = requestBuilder.build();
 
