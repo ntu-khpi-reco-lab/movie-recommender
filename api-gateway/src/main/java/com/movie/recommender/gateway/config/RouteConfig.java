@@ -17,7 +17,7 @@ public class RouteConfig {
                                 .circuitBreaker(config -> config
                                         .setName("location-service-cb")
                                         .setFallbackUri("forward:/locations")))
-                        .uri("http://localhost:9001"))  // Ensure the port matches the Location Service
+                        .uri("http://location-service:9001"))  // Ensure the port matches the Location Service
                 .build();
     }
 }

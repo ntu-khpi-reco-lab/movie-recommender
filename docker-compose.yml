@@ -1,7 +1,62 @@
 services:
-  user-service:
+  api-gateway:
     build:
       context: .
-      dockerfile: ./user-service/Dockerfile
+      dockerfile: ./api-gateway/Dockerfile
     ports:
-      - 8080:8080
+      - "8080:8080"
+    depends_on:
+      - location-service
+    networks:
+      - movie-reco-net
+
+  location-service:
+    build:
+      context: .
+      dockerfile: ./location-service/Dockerfile
+    ports:
+      - "9001:9001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - movie-reco-net
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_HOST: localhost
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: locations,users
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./config:/docker-entrypoint-initdb.d
+    networks:
+      - movie-reco-net
+
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    ports:
+      - "27017:27017"
+    volumes:
+      - type: bind
+        source: ../data # Path to the data folder. Need to be created before running the docker-compose
+        target: /data/db/v6
+
+networks:
+  movie-reco-net:
+    driver: bridge
+
+volumes:
+  mongodb_data_container:
