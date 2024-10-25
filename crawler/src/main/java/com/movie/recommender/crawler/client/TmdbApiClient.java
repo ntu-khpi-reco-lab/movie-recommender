@@ -1,9 +1,9 @@
 package com.movie.recommender.crawler.client;
 
-import com.movie.recommender.common.model.Movie;
-import com.movie.recommender.common.model.MovieList;
-import com.movie.recommender.common.model.MovieCredits;
-import com.movie.recommender.common.model.MovieKeywords;
+import movie.Movie;
+import movie.MovieList;
+import movie.MovieCredits;
+import movie.MovieKeywords;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;

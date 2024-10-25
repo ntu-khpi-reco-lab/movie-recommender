@@ -1,7 +1,7 @@
 package com.movie.recommender.crawler.client;
 
-import com.movie.recommender.common.model.MovieShowtimesResponse;
-import com.movie.recommender.common.model.MovieShowtimesResponse.SearchMetadata;
+import showtime.MovieShowtimesResponse;
+import showtime.MovieShowtimesResponse.SearchMetadata;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
