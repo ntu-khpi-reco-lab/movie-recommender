@@ -4,6 +4,7 @@ import com.movie.recommender.common.model.Movie;
 import com.movie.recommender.common.model.MovieList;
 import com.movie.recommender.common.model.MovieCredits;
 import com.movie.recommender.common.model.MovieKeywords;
+import com.movie.recommender.lib.http.AuthProvider;
 import com.movie.recommender.lib.http.HttpClient;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,12 +12,10 @@ import java.util.Optional;
 
 @Slf4j
 public class TmdbApiClient {
-    public static final String API_KEY = getApiKey();
-
     private final HttpClient httpClient;
 
     public TmdbApiClient() {
-        this.httpClient = new HttpClient(API_KEY);
+        this.httpClient = new HttpClient(new AuthProvider(getApiKey(), null));
     }
 
     public Optional<Movie> getMovieDetails(String movieId) {
