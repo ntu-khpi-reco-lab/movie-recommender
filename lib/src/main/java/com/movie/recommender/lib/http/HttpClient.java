@@ -1,43 +1,44 @@
 package com.movie.recommender.lib.http;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.movie.recommender.lib.http.auth.AuthProvider;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class HttpClient {
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
-    private final String authToken;
+    private final AuthProvider authProvider;
 
-    public HttpClient(String authToken) {
+    public HttpClient(AuthProvider authProvider) {
         this.client = new OkHttpClient();
         this.objectMapper = createObjectMapper();
-        this.authToken = authToken;
+        this.authProvider = authProvider;
     }
 
     public <T> T get(String url, Class<T> tClass) throws IOException {
-        Request.Builder requestBuilder = new Request.Builder().url(url);
+        HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
+        Request.Builder requestBuilder = new Request.Builder();
 
-        // Add Authorization header if auth token is present
-        if (authToken != null) {
-            requestBuilder.addHeader("Authorization", "Bearer " + authToken);
-        }
+        // Apply authentication based on the provider type
+        authProvider.applyAuth(requestBuilder, urlBuilder);
 
-        Request request = requestBuilder.build();
+        Request request = requestBuilder.url(urlBuilder.build()).build();
 
-        // Make the HTTP GET request
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected response code: " + response.code());
             }
-
-            assert response.body() != null;
-
-            // Convert the response body into the specified class type
+            if (response.body() == null) {
+                throw new IOException("Response body is null");
+            }
             return objectMapper.readValue(response.body().string(), tClass);
         }
     }

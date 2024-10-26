@@ -1,10 +1,9 @@
 package com.movie.recommender.crawler.client;
-import com.movie.recommender.common.model.Movie;
 
-import com.movie.recommender.common.model.MovieList;
-
-import com.movie.recommender.common.model.MovieCredits;
-import com.movie.recommender.common.model.MovieKeywords;
+import com.movie.recommender.common.model.movie.Movie;
+import com.movie.recommender.common.model.movie.MovieList;
+import com.movie.recommender.common.model.movie.MovieCredits;
+import com.movie.recommender.common.model.movie.MovieKeywords;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
-
-
 
 public class TmdbApiClientTest {
     private TmdbApiClient tmdbApiClient;
@@ -36,7 +33,6 @@ public class TmdbApiClientTest {
         assertEquals("Harry Potter and the Philosopher's Stone", movieDetails.get().getTitle(),
                 "Movie title should be 'Harry Potter and the Philosopher's Stone'");
     }
-
 
     @Test
     @DisplayName("Test fetching now playing movies")
@@ -85,5 +81,4 @@ public class TmdbApiClientTest {
         // Assert that the keywords list contains keywords
         assertFalse(movieKeywords.get().getKeywords().isEmpty(), "Keywords should contain entries");
     }
-
 }

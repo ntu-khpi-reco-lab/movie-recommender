@@ -1,4 +1,4 @@
-package com.movie.recommender.common.model;
+package com.movie.recommender.common.model.movie;
 
 import lombok.Data;
 import java.util.List;
