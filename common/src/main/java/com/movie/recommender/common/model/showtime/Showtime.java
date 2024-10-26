@@ -1,4 +1,5 @@
-package showtime;
+package com.movie.recommender.common.model.showtime;
+
 import lombok.Data;
 import java.util.List;
 

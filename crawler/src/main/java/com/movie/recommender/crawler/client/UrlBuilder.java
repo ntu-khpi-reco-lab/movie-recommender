@@ -23,9 +23,10 @@ public class UrlBuilder {
         return BASE_TMDB_URL + "/movie/" + movieId + "/keywords";
     }
 
-    public static String movieShowtimesUrl(String movieName,String location, String language,String apikey) {
-        return BASE_SERPAPI_URL + "search.json?q="+encode(movieName)+ "+showtimes&location="
-                + encode(location) + "&hl=" + language + "&api_key=" + apikey;
+    public static String movieShowtimesUrl(String movieName,String location, String language) {
+        return BASE_SERPAPI_URL + "search.json?q=" +
+                encode(movieName)+ "+showtimes&location=" +
+                encode(location) + "&hl=" + language;
     }
 
     private static String encode(String input) {

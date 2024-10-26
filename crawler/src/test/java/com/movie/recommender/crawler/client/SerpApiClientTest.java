@@ -1,14 +1,13 @@
 package com.movie.recommender.crawler.client;
 
-import showtime.MovieShowtimesResponse;
-import showtime.SearchMetadata;
+import com.movie.recommender.crawler.model.showtime.MovieShowtimesResponse;
+import com.movie.recommender.crawler.model.showtime.SearchMetadata;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,6 +32,5 @@ public class SerpApiClientTest {
         // Validate the metadata contains a status
         SearchMetadata metadata = showtimesResponse.get().getSearchMetadata();
         assertNotNull(metadata.getStatus(), "Search metadata status should not be null");
-
     }
 }

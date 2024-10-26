@@ -1,4 +1,4 @@
-package showtime;
+package com.movie.recommender.crawler.model.showtime;
 
 import lombok.Data;
 

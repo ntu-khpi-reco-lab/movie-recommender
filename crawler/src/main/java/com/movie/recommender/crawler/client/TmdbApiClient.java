@@ -1,18 +1,19 @@
 package com.movie.recommender.crawler.client;
 
-import movie.Movie;
-import movie.MovieList;
-import movie.MovieCredits;
-import movie.MovieKeywords;
+import com.movie.recommender.lib.http.auth.AuthProvider;
+import com.movie.recommender.lib.http.auth.BearerAuthProvider;
+import com.movie.recommender.common.model.movie.Movie;
+import com.movie.recommender.common.model.movie.MovieList;
+import com.movie.recommender.common.model.movie.MovieCredits;
+import com.movie.recommender.common.model.movie.MovieKeywords;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
 @Slf4j
 public class TmdbApiClient extends ApiClient {
-
     public TmdbApiClient() {
-        super("TMDB_API_KEY");
+        super();
     }
 
     public Optional<Movie> getMovieDetails(String movieId) {
@@ -35,4 +36,9 @@ public class TmdbApiClient extends ApiClient {
         return callApi(url, MovieKeywords.class);
     }
 
+    @Override
+    protected AuthProvider createAuthProvider() {
+        String authToken = getApiKey("TMDB_API_KEY");
+        return new BearerAuthProvider(authToken);
+    }
 }
