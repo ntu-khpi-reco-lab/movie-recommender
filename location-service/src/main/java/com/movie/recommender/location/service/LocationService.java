@@ -1,28 +1,83 @@
 package com.movie.recommender.location.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.movie.recommender.location.exception.LocationNotFoundException;
+import com.movie.recommender.location.model.entity.City;
+import com.movie.recommender.location.model.entity.Country;
+import com.movie.recommender.location.repository.CityRepository;
+import com.movie.recommender.location.repository.CountryRepository;
 import com.movie.recommender.location.repository.LocationRepository;
 import com.movie.recommender.location.model.dto.LocationCreateDTO;
 import com.movie.recommender.location.model.dto.LocationUpdateDTO;
 import com.movie.recommender.location.model.entity.Location;
 import com.movie.recommender.location.model.dto.LocationDTO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
 public class LocationService {
 
     private final LocationRepository locationRepository;
+    private final CityRepository cityRepository;
+    private final CountryRepository countryRepository;
+    private final RestTemplate restTemplate;
 
-    public LocationService(LocationRepository locationRepository) {
+    public LocationService(LocationRepository locationRepository, CityRepository cityRepository, CountryRepository countryRepository, RestTemplate restTemplate) {
         this.locationRepository = locationRepository;
+        this.cityRepository = cityRepository;
+        this.countryRepository = countryRepository;
+        this.restTemplate = restTemplate;
     }
 
     @Transactional
     public LocationDTO saveLocation(LocationCreateDTO locationCreateDTO) {
         log.info("Saving new location for user: {}", locationCreateDTO.getUserId());
+        log.info("Fetching or creating city for user: {}", locationCreateDTO.getUserId());
+
+        String cityName;
+        String countryName;
+
+        try {
+            String GEOLOCATION_URL = "https://geocode.xyz/%s,%s?geoit=json";
+            ResponseEntity<String> response = restTemplate.getForEntity(
+                    String.format(GEOLOCATION_URL, locationCreateDTO.getLatitude(), locationCreateDTO.getLongitude()),
+                    String.class
+            );
+            JsonNode jsonNode = (new ObjectMapper()).readTree(response.getBody());
+            cityName = jsonNode.get("city").asText();
+            countryName = jsonNode.get("country").asText();
+            log.info("Saving new location for city: {} and country: {}", cityName, countryName);
+
+        } catch (Exception e){
+            throw new LocationNotFoundException(e.getMessage());
+        }
+
+        log.info("Fetching city: {} and country: {}", cityName, countryName);
+        Country country = countryRepository.findByName(countryName)
+                .orElseGet(() -> {
+                    log.info("Creating new country: {}", countryName);
+                    Country newCountry = new Country();
+                    newCountry.setName(countryName);
+                    log.info("New country {} was successfully created", newCountry);
+                    return countryRepository.save(newCountry);
+                });
+
+        City city = cityRepository.findByNameAndCountry(cityName, country)
+                .orElseGet(() -> {
+                    log.info("Creating new city: {}", cityName);
+                    City newCity = new City();
+                    newCity.setName(cityName);
+                    newCity.setCountry(country);
+                    log.info("New city {} was successfully created", newCity);
+                    return cityRepository.save(newCity);
+                });
+
+        locationCreateDTO.setCity(city);
 
         Location location = LocationCreateDTO.toEntity(locationCreateDTO);
         Location savedLocation = locationRepository.save(location);

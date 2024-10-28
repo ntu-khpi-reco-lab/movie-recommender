@@ -35,9 +35,14 @@ public class Location {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Location(double latitude, double longitude, Long userId) {
+    @ManyToOne
+    @JoinColumn(name = "city_id", referencedColumnName = "id")
+    private City city;
+
+    public Location(double latitude, double longitude, Long userId, City city) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.userId = userId;
+        this.city = city;
     }
 }
