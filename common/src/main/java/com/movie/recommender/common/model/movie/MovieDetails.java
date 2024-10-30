@@ -13,6 +13,9 @@ public class MovieDetails {
     private Double rating;
     private Integer runtime;
     private boolean adult;
+    private List<Movie.Genre> genres;
+    private String posterPath;
+    private String backdropPath;
 
     // Direct lists for cast, crew, and keywords
     private List<MovieCredits.CastMember> cast;

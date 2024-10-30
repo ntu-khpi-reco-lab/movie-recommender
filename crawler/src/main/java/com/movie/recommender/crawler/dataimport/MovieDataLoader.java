@@ -1,4 +1,4 @@
-package dataimport;
+package com.movie.recommender.crawler.dataimport;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieDataParser {
-    private static final Logger logger = LoggerFactory.getLogger(MovieDataParser.class);
+public class MovieDataLoader {
+    private static final Logger logger = LoggerFactory.getLogger(MovieDataLoader.class);
     private final ObjectMapper objectMapper;
 
-    public MovieDataParser() {
+    public MovieDataLoader() {
         objectMapper = new ObjectMapper();
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -30,32 +30,38 @@ public class MovieDataParser {
         List<MovieDetails> movieDetailsList = new ArrayList<>();
         try {
             JsonNode rootNode = objectMapper.readTree(new File(filePath));
-
             for (JsonNode entryNode : rootNode) {
-                // Parse basic movie details
-                MovieDetails movieDetails = objectMapper.treeToValue(entryNode.path("detail").get(0), MovieDetails.class);
-
-                // Parse cast, crew, and keywords directly
-                List<CastMember> cast = objectMapper.convertValue(entryNode.path("credit").get(0).path("cast"),
-                        objectMapper.getTypeFactory().constructCollectionType(List.class, CastMember.class));
-                List<CrewMember> crew = objectMapper.convertValue(entryNode.path("credit").get(0).path("crew"),
-                        objectMapper.getTypeFactory().constructCollectionType(List.class, CrewMember.class));
-                List<Keyword> keywords = objectMapper.convertValue(entryNode.path("keyword").get(0).path("keywords"),
-                        objectMapper.getTypeFactory().constructCollectionType(List.class, Keyword.class));
-
-                // Set cast, crew, and keywords in MovieDetails
-                movieDetails.setCast(cast);
-                movieDetails.setCrew(crew);
-                movieDetails.setKeywords(keywords);
-
-                movieDetailsList.add(movieDetails);
+                MovieDetails movieDetails = parseMovieEntry(entryNode);
+                if (movieDetails != null) {
+                    movieDetailsList.add(movieDetails);
+                }
             }
         } catch (IOException e) {
             logger.error("Error reading movie data from file: {}", filePath, e);
         } catch (Exception e) {
             logger.error("Unexpected error occurred while parsing movie data: {}", e.getMessage(), e);
         }
-
         return movieDetailsList;
+    }
+
+    private MovieDetails parseMovieEntry(JsonNode entryNode) {
+        try {
+            // Parse basic movie details
+            MovieDetails movieDetails = objectMapper.treeToValue(entryNode.path("detail").get(0), MovieDetails.class);
+
+            // Parse and set cast, crew, and keywords
+            movieDetails.setCast(parseList(entryNode.path("credit").get(0).path("cast"), CastMember.class));
+            movieDetails.setCrew(parseList(entryNode.path("credit").get(0).path("crew"), CrewMember.class));
+            movieDetails.setKeywords(parseList(entryNode.path("keyword").get(0).path("keywords"), Keyword.class));
+
+            return movieDetails;
+        } catch (Exception e) {
+            logger.error("Error parsing movie entry: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private <T> List<T> parseList(JsonNode node, Class<T> clazz) {
+        return objectMapper.convertValue(node, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
     }
 }
