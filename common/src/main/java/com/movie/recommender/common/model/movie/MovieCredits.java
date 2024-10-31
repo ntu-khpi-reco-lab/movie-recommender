@@ -1,8 +1,6 @@
 package com.movie.recommender.common.model.movie;
 
 import lombok.Data;
-
-
 import java.util.List;
 
 @Data
@@ -42,4 +40,3 @@ public class MovieCredits {
         private String knownForDepartment;
     }
 }
-
