@@ -7,20 +7,36 @@ import java.util.List;
 public class MovieCredits {
     private int id;
     private List<CastMember> cast;
+    private List<CrewMember> crew;
 
     @Data
     public static class CastMember {
-        private boolean adult;
-        private int gender;
         private int id;
-        private String knownForDepartment;
+        private boolean adult;
+        private String character;
+        private int castId;
+        private String creditId;
         private String name;
         private String originalName;
+        private int gender;
         private double popularity;
         private String profilePath;
-        private int castId;
-        private String character;
-        private String creditId;
         private int order;
+        private String knownForDepartment;
+    }
+
+    @Data
+    public static class CrewMember {
+        private int id;
+        private boolean adult;
+        private String department;
+        private String job;
+        private String creditId;
+        private String name;
+        private String originalName;
+        private int gender;
+        private double popularity;
+        private String profilePath;
+        private String knownForDepartment;
     }
 }
