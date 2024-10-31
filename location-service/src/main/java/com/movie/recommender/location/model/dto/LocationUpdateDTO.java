@@ -1,5 +1,6 @@
 package com.movie.recommender.location.model.dto;
 
+import com.movie.recommender.location.model.entity.City;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
@@ -17,4 +18,6 @@ public class LocationUpdateDTO {
     @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180 degrees")
     @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180 degrees")
     private double longitude;
+
+    private City city;
 }

@@ -1,0 +1,6 @@
+server:
+  port: 9001  # Location Service running on port 9001
+
+spring:
+  application:
+    name: location-service
