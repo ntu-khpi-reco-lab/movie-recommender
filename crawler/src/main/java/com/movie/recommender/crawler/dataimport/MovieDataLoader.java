@@ -8,22 +8,23 @@ import com.movie.recommender.common.model.movie.MovieCredits.CastMember;
 import com.movie.recommender.common.model.movie.MovieCredits.CrewMember;
 import com.movie.recommender.common.model.movie.MovieKeywords.Keyword;
 import com.movie.recommender.common.model.movie.MovieDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
+@Component
 public class MovieDataLoader {
-    private static final Logger logger = LoggerFactory.getLogger(MovieDataLoader.class);
     private final ObjectMapper objectMapper;
 
-    public MovieDataLoader() {
-        objectMapper = new ObjectMapper();
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public MovieDataLoader(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+        this.objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public List<MovieDetails> parseMovieData(String filePath) {
@@ -37,9 +38,9 @@ public class MovieDataLoader {
                 }
             }
         } catch (IOException e) {
-            logger.error("Error reading movie data from file: {}", filePath, e);
+            log.error("Error reading movie data from file: {}", filePath, e);
         } catch (Exception e) {
-            logger.error("Unexpected error occurred while parsing movie data: {}", e.getMessage(), e);
+            log.error("Unexpected error occurred while parsing movie data: {}", e.getMessage(), e);
         }
         return movieDetailsList;
     }
@@ -56,7 +57,7 @@ public class MovieDataLoader {
 
             return movieDetails;
         } catch (Exception e) {
-            logger.error("Error parsing movie entry: {}", e.getMessage(), e);
+            log.error("Error parsing movie entry: {}", e.getMessage(), e);
             return null;
         }
     }

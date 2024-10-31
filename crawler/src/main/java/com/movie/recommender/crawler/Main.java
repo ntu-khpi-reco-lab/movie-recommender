@@ -1,37 +1,29 @@
 package com.movie.recommender.crawler;
 
-
-import com.movie.recommender.common.model.movie.MovieDetails;
-import com.movie.recommender.crawler.dataimport.MongoDBService;
 import com.movie.recommender.crawler.dataimport.MovieDataInitializer;
-import com.movie.recommender.crawler.dataimport.MovieDataLoader;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
-
-import java.util.List;
-
+@SpringBootApplication
+@Slf4j
 public class Main {
+    public static void main(String[] args) {
+        ApplicationContext context = SpringApplication.run(Main.class, args);
+        log.info("Crawler started");
+        initializeMovieData(context);
+    }
 
-    public static void initializeMovieData() {
+    private static void initializeMovieData(ApplicationContext context) {
         String datasetPath = System.getenv("DATASETPATH");
-
         if (datasetPath == null) {
-            System.err.println("DATASETPATH environment variable is not set.");
+            log.error("DATASETPATH environment variable is not set.");
             return;
         }
 
-        // Initialize data loader, MongoDB service, and data initializer
-        MovieDataLoader movieDataLoader = new MovieDataLoader();
-        MongoDBService mongoDBService = new MongoDBService();
-        MovieDataInitializer dataInitializer = new MovieDataInitializer(movieDataLoader, mongoDBService);
-
-        // Load data and handle MongoDB insertion
+        // Initialize movie data
+        MovieDataInitializer dataInitializer = context.getBean(MovieDataInitializer.class);
         dataInitializer.initializeData(datasetPath);
     }
-
-    public static void main(String[] args) {
-        System.out.println("Crawler started");
-        initializeMovieData();
-    }
-
-
 }
