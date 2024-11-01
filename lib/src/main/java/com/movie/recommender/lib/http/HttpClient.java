@@ -3,6 +3,7 @@ package com.movie.recommender.lib.http;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.movie.recommender.lib.http.auth.AuthProvider;
+import com.movie.recommender.lib.http.auth.NoAuthProvider;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -16,6 +17,12 @@ public class HttpClient {
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
     private final AuthProvider authProvider;
+
+    public HttpClient(){
+        this.client = new OkHttpClient();
+        this.objectMapper = createObjectMapper();
+        this.authProvider = new NoAuthProvider();
+    }
 
     public HttpClient(AuthProvider authProvider) {
         this.client = new OkHttpClient();

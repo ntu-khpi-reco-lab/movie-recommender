@@ -18,6 +18,7 @@ public class LocationCreateDTO {
     @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180 degrees")
     @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180 degrees")
     private double longitude;
+
     private Long userId;
 
     public static Location toEntity(LocationCreateDTO locationCreateDTO) {

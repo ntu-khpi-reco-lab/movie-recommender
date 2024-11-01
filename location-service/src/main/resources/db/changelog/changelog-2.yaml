@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-countries-and-cities-tables
+      author: MykytaKa
+      changes:
+        - sqlFile:
+            path: ../migrations/V2__Create_cities_and_countries_tables.sql
+            relativeToChangelogFile: true
