@@ -23,4 +23,8 @@ public class Country {
 
     @OneToMany(mappedBy = "country")
     private List<City> cities;
+
+    public Country(String name) {
+        this.name = name;
+    }
 }

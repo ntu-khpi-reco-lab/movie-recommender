@@ -1,7 +1,7 @@
 package com.movie.recommender.location.service;
 
 import com.movie.recommender.location.exception.LocationNotFoundException;
-import com.movie.recommender.location.model.entity.GeolocationResult;
+import com.movie.recommender.location.model.dto.GeolocationResult;
 import com.movie.recommender.location.repository.LocationRepository;
 import com.movie.recommender.location.repository.CountryRepository;
 import com.movie.recommender.location.model.dto.LocationCreateDTO;
@@ -25,19 +25,20 @@ public class LocationService {
     private final CountryRepository countryRepository;
     private final GeolocationService geolocationService;
 
-    public LocationService(LocationRepository locationRepository, CityRepository cityRepository, CountryRepository countryRepository, GeolocationService geolocationService) {
+    public LocationService(LocationRepository locationRepository,
+                           CityRepository cityRepository,
+                           CountryRepository countryRepository,
+                           GeolocationService geolocationService) {
         this.locationRepository = locationRepository;
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
         this.geolocationService = geolocationService;
     }
 
-    @Transactional
-    public City getCityByCoordinates(Double latitude, Double longitude) {
+    private City getCityByCoordinates(Double latitude, Double longitude) {
         log.info("Fetching or creating geolocation");
 
-        GeolocationResult result;
-        result = geolocationService.fetchGeolocation(latitude, longitude);
+        GeolocationResult result = geolocationService.fetchGeolocation(latitude, longitude);
 
         String cityName = result.getCity();
         String countryName = result.getCountry();
@@ -47,28 +48,23 @@ public class LocationService {
         return findOrCreateCityByName(cityName, country);
     }
 
-    @Transactional
-    public Country findOrCreateCountryByName(String name) {
+    private Country findOrCreateCountryByName(String name) {
         log.info("Finding country by name: {}", name);
         return countryRepository.findByName(name)
                 .orElseGet(() -> {
                     log.info("Creating new country: {}", name);
-                    Country newCountry = new Country();
-                    newCountry.setName(name);
+                    Country newCountry = new Country(name);
                     log.info("New country {} was successfully created", newCountry);
                     return countryRepository.save(newCountry);
                 });
     }
 
-    @Transactional
-    public City findOrCreateCityByName(String name, Country country) {
+    private City findOrCreateCityByName(String name, Country country) {
         log.info("Finding city by name: {}", name);
         return cityRepository.findByNameAndCountry(name, country)
                 .orElseGet(() -> {
                     log.info("Creating new city: {}", name);
-                    City newCity = new City();
-                    newCity.setName(name);
-                    newCity.setCountry(country);
+                    City newCity = new City(name, country);
                     log.info("New city {} was successfully created", newCity);
                     return cityRepository.save(newCity);
                 });

@@ -22,4 +22,9 @@ public class City {
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
+
+    public City(@NotNull String name, @NotNull Country country) {
+        this.name = name;
+        this.country = country;
+    }
 }
