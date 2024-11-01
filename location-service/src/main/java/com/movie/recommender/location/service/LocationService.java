@@ -79,8 +79,8 @@ public class LocationService {
         log.info("Saving new location for user: {}", locationCreateDTO.getUserId());
         City city = getCityByCoordinates(locationCreateDTO.getLatitude(), locationCreateDTO.getLongitude());
 
-        locationCreateDTO.setCity(city);
         Location location = LocationCreateDTO.toEntity(locationCreateDTO);
+        location.setCity(city);
         Location savedLocation = locationRepository.save(location);
 
         log.info("New location with ID {} was saved for user {}", savedLocation.getId(), locationCreateDTO.getUserId());

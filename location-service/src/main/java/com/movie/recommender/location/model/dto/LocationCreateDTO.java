@@ -1,6 +1,5 @@
 package com.movie.recommender.location.model.dto;
 
-import com.movie.recommender.location.model.entity.City;
 import com.movie.recommender.location.model.entity.Location;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -22,14 +21,11 @@ public class LocationCreateDTO {
 
     private Long userId;
 
-    private City city;
-
     public static Location toEntity(LocationCreateDTO locationCreateDTO) {
         return new Location(
                 locationCreateDTO.getLatitude(),
                 locationCreateDTO.getLongitude(),
-                locationCreateDTO.getUserId(),
-                locationCreateDTO.getCity()
+                locationCreateDTO.getUserId()
         );
     }
 }

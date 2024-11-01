@@ -39,10 +39,9 @@ public class Location {
     @JoinColumn(name = "city_id", referencedColumnName = "id")
     private City city;
 
-    public Location(double latitude, double longitude, Long userId, City city) {
+    public Location(double latitude, double longitude, Long userId) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.userId = userId;
-        this.city = city;
     }
 }
