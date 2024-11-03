@@ -3,6 +3,7 @@ package com.movie.recommender.user.controller;
 import com.movie.recommender.user.config.JwtUtil;
 import com.movie.recommender.user.model.dto.UserCreateDTO;
 import com.movie.recommender.user.model.dto.UserDTO;
+import com.movie.recommender.user.model.dto.UserLoginDTO;
 import com.movie.recommender.user.model.entity.User;
 import com.movie.recommender.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        String token = userService.login(username, password);
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+        String token = userService.login(userLoginDTO.getUsername(), userLoginDTO.getPassword());
         return ResponseEntity.ok(token);
     }
 }
