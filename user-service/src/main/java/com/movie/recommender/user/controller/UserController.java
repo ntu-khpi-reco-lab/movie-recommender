@@ -1,5 +1,7 @@
 package com.movie.recommender.user.controller;
 
+import com.movie.recommender.user.config.JwtUtil;
+import com.movie.recommender.user.model.dto.UserCreateDTO;
 import com.movie.recommender.user.model.dto.UserDTO;
 import com.movie.recommender.user.model.entity.User;
 import com.movie.recommender.user.service.UserService;
@@ -17,30 +19,23 @@ import org.springframework.security.core.AuthenticationException;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-    // Регистрация пользователя через DTO
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
-        UserDTO registeredUser = userService.registerUser(userDTO);
-        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+    public ResponseEntity<UserDTO> register(@RequestBody UserCreateDTO userCreateDTO) {
+        UserDTO userDTO = userService.registerUser(userCreateDTO);
+        return ResponseEntity.ok(userDTO);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody UserDTO userDTO) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword()));
-            if (authentication.isAuthenticated()) {
-                return new ResponseEntity<>("Login successful", HttpStatus.OK);
-            }
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
-        }
-        return new ResponseEntity<>("Authentication failed", HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
+        String token = userService.login(username, password);
+        return ResponseEntity.ok(token);
     }
 }
+

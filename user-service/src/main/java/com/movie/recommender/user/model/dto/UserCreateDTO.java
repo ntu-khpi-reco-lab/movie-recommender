@@ -8,20 +8,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
-    private Long id;
+public class UserCreateDTO {
     private String username;
+    private String password;
     private String email;
     private String firstName;
     private String lastName;
 
-    public static UserDTO toDTO(User user) {
-        return new UserDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName()
-        );
+    public User toEntity() {
+        User user = new User();
+        user.setUsername(this.username);
+        user.setPassword(this.password);
+        user.setEmail(this.email);
+        user.setFirstName(this.firstName);
+        user.setLastName(this.lastName);
+        return user;
     }
 }
