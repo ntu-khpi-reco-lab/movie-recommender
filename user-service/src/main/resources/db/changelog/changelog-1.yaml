@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-user-table
+      author: Andrew
+      changes:
+        - sqlFile:
+            path: ../migrations/V1__Create_user_table.sql
+            relativeToChangelogFile: true
