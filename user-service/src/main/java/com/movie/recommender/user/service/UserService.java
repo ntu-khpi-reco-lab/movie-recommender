@@ -1,19 +1,15 @@
 package com.movie.recommender.user.service;
 
-import com.movie.recommender.user.config.JwtUtil;
+import com.movie.recommender.user.exception.UserAlreadyExistsException;
+import com.movie.recommender.user.security.JwtUtil;
 import com.movie.recommender.user.exception.UserNotFoundException;
 import com.movie.recommender.user.model.dto.UserCreateDTO;
 import com.movie.recommender.user.model.dto.UserDTO;
 import com.movie.recommender.user.model.entity.User;
 import com.movie.recommender.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-
 
 @Service
 public class UserService {
@@ -31,7 +27,7 @@ public class UserService {
 
     public UserDTO registerUser(UserCreateDTO userCreateDTO) {
         if (userRepository.findByUsername(userCreateDTO.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new UserAlreadyExistsException("Username already exists");
         }
         User user = userCreateDTO.toEntity();
         user.setPassword(passwordEncoder.encode(user.getPassword()));

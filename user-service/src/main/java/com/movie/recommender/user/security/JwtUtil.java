@@ -1,13 +1,16 @@
-package com.movie.recommender.user.config;
+package com.movie.recommender.user.security;
 
-import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -27,14 +30,26 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+        Claims claims = getClaims(token);
+        return claims != null ? claims.getSubject() : null;
     }
 
     public boolean isTokenValid(String token, String username) {
-        return (extractUsername(token).equals(username)) && !isTokenExpired(token);
+        String extractedUsername = extractUsername(token);
+        return (extractedUsername != null && extractedUsername.equals(username)) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration().before(new Date());
+        Claims claims = getClaims(token);
+        return claims != null && claims.getExpiration().before(new Date());
+    }
+
+    private Claims getClaims(String token) {
+        try {
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            return null;
+        }
     }
 }
