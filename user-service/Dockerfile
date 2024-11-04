@@ -23,7 +23,7 @@ WORKDIR /app
 COPY --from=build /app/user-service/target/*.jar app.jar
 
 # Step 9: Expose the port that app uses
-EXPOSE 8080
+EXPOSE 9002
 
 # Step 10: Run the Spring Boot app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=docker"]

@@ -7,7 +7,6 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 
 @Configuration
 public class RouteConfig {
-
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -18,6 +17,13 @@ public class RouteConfig {
                                         .setName("location-service-cb")
                                         .setFallbackUri("forward:/locations")))
                         .uri("http://location-service:9001"))  // Ensure the port matches the Location Service
+                .route("user-service", r -> r
+                        .path("/api/v1/users/**")
+                        .filters(f -> f
+                                .circuitBreaker(config -> config
+                                        .setName("user-service-cb")
+                                        .setFallbackUri("forward:/users")))
+                        .uri("http://user-service:9002"))  // Ensure the port matches the User Service
                 .build();
     }
 }

@@ -7,23 +7,20 @@ WORKDIR /app
 # Step 3: Copy the entire project into the Docker container
 COPY . /app
 
-# Step 4: Set the working directory to the location-service submodule
-WORKDIR /app/location-service
-
-# Step 5: Build only the location-service module using Maven
+# Step 4: Build only the location-service module using Maven
 RUN mvn clean package -DskipTests
 
-# Step 6: Use an official Amazon Corretto JDK image for the runtime
+# Step 5: Use an official Amazon Corretto JDK image for the runtime
 FROM amazoncorretto:21-alpine-jdk
 
-# Step 7: Set the working directory inside the container
+# Step 6: Set the working directory inside the container
 WORKDIR /app
 
-# Step 8: Copy the built JAR from the child module's target directory in the build stage
+# Step 7: Copy the built JAR from the child module's target directory in the build stage
 COPY --from=build /app/location-service/target/*.jar app.jar
 
-# Step 9: Expose the port that app uses
+# Step 8: Expose the port that app uses
 EXPOSE 9001
 
-# Step 10: Run the Spring Boot app
+# Step 9: Run the Spring Boot app
 ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=docker"]

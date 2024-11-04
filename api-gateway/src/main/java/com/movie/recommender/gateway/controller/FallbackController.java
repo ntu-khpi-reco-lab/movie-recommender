@@ -17,4 +17,9 @@ public class FallbackController {
     public ResponseEntity<String> locationServiceFallback() {
         return new ResponseEntity<>("Location Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
     }
+
+    @GetMapping("/users")
+    public ResponseEntity<String> userServiceFallback() {
+        return new ResponseEntity<>("User Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+    }
 }

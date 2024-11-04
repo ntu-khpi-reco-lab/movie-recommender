@@ -7,6 +7,7 @@ services:
       - "8080:8080"
     depends_on:
       - location-service
+      - user-service
     networks:
       - movie-reco-net
 
@@ -16,6 +17,18 @@ services:
       dockerfile: ./location-service/Dockerfile
     ports:
       - "9001:9001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - movie-reco-net
+
+  user-service:
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    ports:
+      - "9002:9002"
     depends_on:
       postgres:
         condition: service_healthy
