@@ -12,14 +12,17 @@ import java.util.List;
 @Slf4j
 public class MovieDataInitializer {
     private final MovieDataLoader movieDataLoader;
+    private final MongoDBService mongoDBService;
 
-    public MovieDataInitializer(MovieDataLoader movieDataLoader, MovieRepository movieRepository) {
+
+    public MovieDataInitializer(MovieDataLoader movieDataLoader, MongoDBService mongoDBService) {
         this.movieDataLoader = movieDataLoader;
+        this.mongoDBService = mongoDBService;
     }
 
-    public List<MovieDetails>  initializeData(String filePath) {
+    public void initializeData(String filePath) {
         List<MovieDetails> movieDetailsList = movieDataLoader.parseMovieData(filePath);
         log.info("Loaded {} movie records from {}", movieDetailsList.size(), filePath);
-        return movieDetailsList;
+        mongoDBService.insertMovies(movieDetailsList);
     }
 }

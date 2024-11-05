@@ -27,9 +27,8 @@ public class Main {
         }
 
         // Initialize movie data
+        // Initialize movie data
         MovieDataInitializer dataInitializer = context.getBean(MovieDataInitializer.class);
-        List<MovieDetails> movieDetailsList = dataInitializer.initializeData(datasetPath);
-        MongoDBService mongoDBService = context.getBean(MongoDBService.class);
-        mongoDBService.insertMovies(movieDetailsList);
+        dataInitializer.initializeData(datasetPath);
     }
 }
