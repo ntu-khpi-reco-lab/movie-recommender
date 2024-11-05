@@ -17,6 +17,12 @@ public class MongoDBService {
         this.movieRepository = movieRepository;
     }
 
+    public boolean isDataInitialized() {
+        long count = movieRepository.count();
+        log.info("Movie data record count in MongoDB: {}", count);
+        return count > 0;
+    }
+
     public void insertMovies(List<MovieDetails> movieDetailsList) {
         try {
             log.info("Inserting movie data into MongoDB...");

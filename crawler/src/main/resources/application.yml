@@ -9,3 +9,6 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017
       database: movieDB
+
+dataset:
+  path: C:/3course_project/data/movies.json

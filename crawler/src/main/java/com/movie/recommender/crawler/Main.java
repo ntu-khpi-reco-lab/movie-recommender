@@ -20,15 +20,7 @@ public class Main {
     }
 
     private static void initializeMovieData(ApplicationContext context) {
-        String datasetPath = System.getenv("DATASETPATH");
-        if (datasetPath == null) {
-            log.error("DATASETPATH environment variable is not set.");
-            return;
-        }
-
-        // Initialize movie data
-        // Initialize movie data
         MovieDataInitializer dataInitializer = context.getBean(MovieDataInitializer.class);
-        dataInitializer.initializeData(datasetPath);
+        dataInitializer.initializeData();
     }
 }
