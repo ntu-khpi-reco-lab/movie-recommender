@@ -4,3 +4,33 @@ server:
 spring:
   application:
     name: location-service
+
+  # PostgreSQL configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/locations
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  # Hibernate configuration
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+
+  # Liquibase configuration
+  liquibase:
+    enabled: true
+    default-schema: public
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+# Docker-specific configuration
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://postgres:5432/locations
