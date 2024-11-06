@@ -1,19 +1,21 @@
 package com.movie.recommender.location.service;
 
 import com.movie.recommender.location.exception.LocationNotFoundException;
-import com.movie.recommender.location.model.dto.GeolocationResult;
+import com.movie.recommender.location.model.dto.*;
 import com.movie.recommender.location.repository.LocationRepository;
 import com.movie.recommender.location.repository.CountryRepository;
-import com.movie.recommender.location.model.dto.LocationCreateDTO;
-import com.movie.recommender.location.model.dto.LocationUpdateDTO;
 import com.movie.recommender.location.repository.CityRepository;
 import com.movie.recommender.location.model.entity.Location;
-import com.movie.recommender.location.model.dto.LocationDTO;
 import com.movie.recommender.location.model.entity.Country;
 import com.movie.recommender.location.model.entity.City;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -116,5 +118,21 @@ public class LocationService {
     private Location findLocationByUserId(Long userId) {
         return locationRepository.findByUserId(userId)
                 .orElseThrow(() -> new LocationNotFoundException("Location not found for user ID: " + userId));
+    }
+
+    public Map<String, List<String>> getAllCountriesAndCities() {
+        log.info("Fetching all countries and cities");
+
+        List<CountryCityDTO> countriesAndCities = countryRepository.getAllCountriesAndCities();
+
+        Map<String, List<String>> countriesCitiesMap = new HashMap<>();
+
+        for (CountryCityDTO entry : countriesAndCities) {
+            countriesCitiesMap
+                    .computeIfAbsent(entry.getCountryName(), k -> new ArrayList<>())
+                    .add(entry.getCityName());
+        }
+
+        return countriesCitiesMap;
     }
 }

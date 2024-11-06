@@ -1,14 +1,16 @@
 package com.movie.recommender.location.controller;
 
-import com.movie.recommender.location.model.dto.LocationCreateDTO;
-import com.movie.recommender.location.model.dto.LocationUpdateDTO;
+import com.movie.recommender.location.model.dto.*;
 import com.movie.recommender.location.service.LocationService;
-import com.movie.recommender.location.model.dto.LocationDTO;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.Valid;
+
+import java.util.List;
+import java.util.Map;
+
 
 @Slf4j
 @RestController
@@ -45,5 +47,11 @@ public class LocationController {
             @RequestBody @Valid LocationUpdateDTO locationUpdateDTO) {
         LocationDTO updatedLocation = locationService.updateLocationByUserId(userId, locationUpdateDTO);
         return ResponseEntity.ok(updatedLocation);
+    }
+
+    @GetMapping("/countries/cities")
+    public ResponseEntity<Map<String, List<String>>> getAllCountriesAndCities() {
+        Map<String, List<String>> result = locationService.getAllCountriesAndCities();
+        return ResponseEntity.ok(result);
     }
 }
