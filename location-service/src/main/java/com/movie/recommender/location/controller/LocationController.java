@@ -7,9 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.Valid;
-
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -50,8 +48,8 @@ public class LocationController {
     }
 
     @GetMapping("/countries/cities")
-    public ResponseEntity<Map<String, List<String>>> getAllCountriesAndCities() {
-        Map<String, List<String>> result = locationService.getAllCountriesAndCities();
+    public ResponseEntity<List<CountryWithCitiesDTO>> getAllCountriesAndCities() {
+        List<CountryWithCitiesDTO> result = locationService.getAllCountriesAndCities();
         return ResponseEntity.ok(result);
     }
 }

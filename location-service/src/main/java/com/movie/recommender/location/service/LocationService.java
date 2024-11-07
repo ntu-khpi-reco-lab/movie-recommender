@@ -120,11 +120,10 @@ public class LocationService {
                 .orElseThrow(() -> new LocationNotFoundException("Location not found for user ID: " + userId));
     }
 
-    public Map<String, List<String>> getAllCountriesAndCities() {
+    public List<CountryWithCitiesDTO> getAllCountriesAndCities() {
         log.info("Fetching all countries and cities");
 
         List<CountryCityDTO> countriesAndCities = countryRepository.getAllCountriesAndCities();
-
         Map<String, List<String>> countriesCitiesMap = new HashMap<>();
 
         for (CountryCityDTO entry : countriesAndCities) {
@@ -133,6 +132,11 @@ public class LocationService {
                     .add(entry.getCityName());
         }
 
-        return countriesCitiesMap;
+        List<CountryWithCitiesDTO> result = new ArrayList<>();
+        for (Map.Entry<String, List<String>> entry : countriesCitiesMap.entrySet()) {
+            result.add(new CountryWithCitiesDTO(entry.getKey(), entry.getValue()));
+        }
+
+        return result;
     }
 }

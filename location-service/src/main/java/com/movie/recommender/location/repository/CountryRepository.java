@@ -10,7 +10,6 @@ import java.util.List;
 public interface CountryRepository extends JpaRepository<Country, Long> {
     Optional<Country> findByName(String name);
     @Query("SELECT new com.movie.recommender.location.model.dto.CountryCityDTO(cn.name, ct.name) " +
-            "FROM City ct JOIN Location l ON ct.id = l.city.id " +
-            "JOIN Country cn ON cn.id = ct.country.id")
+            "FROM City ct JOIN Country cn ON cn.id = ct.country.id")
     List<CountryCityDTO> getAllCountriesAndCities();
 }
