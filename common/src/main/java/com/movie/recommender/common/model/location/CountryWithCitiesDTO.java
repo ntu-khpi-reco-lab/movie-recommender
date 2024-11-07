@@ -1,4 +1,4 @@
-package com.movie.recommender.location.model.dto;
+package com.movie.recommender.common.model.location;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
