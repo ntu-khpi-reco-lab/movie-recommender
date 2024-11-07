@@ -1,26 +1,33 @@
 package com.movie.recommender.crawler;
 
-import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.crawler.dataimport.MovieDataInitializer;
-import com.movie.recommender.crawler.service.MongoDBService;
+import com.movie.recommender.crawler.service.MovieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContext;
-
-import java.util.List;
 
 @SpringBootApplication
 @Slf4j
-public class Main {
+@EnableFeignClients(basePackages = "com.movie.recommender.common.client")
+public class CrawlerApplication {
     public static void main(String[] args) {
-        ApplicationContext context = SpringApplication.run(Main.class, args);
+        ApplicationContext context = SpringApplication.run(CrawlerApplication.class, args);
         log.info("Crawler started");
         initializeMovieData(context);
+        getCountryWithCities(context);
     }
 
     private static void initializeMovieData(ApplicationContext context) {
         MovieDataInitializer dataInitializer = context.getBean(MovieDataInitializer.class);
         dataInitializer.initializeData();
+    }
+
+    // For testing purposes. Verify that the country with cities is retrieved.
+    // Should be removed later.
+    private static void getCountryWithCities(ApplicationContext context) {
+        MovieService movieService = context.getBean(MovieService.class);
+        movieService.getCountryWithCities();
     }
 }

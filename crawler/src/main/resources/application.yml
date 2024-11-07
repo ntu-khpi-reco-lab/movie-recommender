@@ -1,6 +1,11 @@
 server:
   port: 9003  # Crawler runs on port 9003
 
+service:
+  location:
+    service:
+      url: http://localhost:9001
+
 spring:
   application:
     name: crawler

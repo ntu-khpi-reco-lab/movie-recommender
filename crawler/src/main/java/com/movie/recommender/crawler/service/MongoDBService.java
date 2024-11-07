@@ -1,4 +1,5 @@
 package com.movie.recommender.crawler.service;
+
 import com.mongodb.MongoException;
 import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.crawler.repository.MovieRepository;
@@ -10,7 +11,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class MongoDBService {
-
     private final MovieRepository movieRepository;
 
     public MongoDBService(MovieRepository movieRepository) {
