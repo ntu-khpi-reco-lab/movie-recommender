@@ -7,9 +7,11 @@ import com.movie.recommender.common.model.movie.MovieList;
 import com.movie.recommender.common.model.movie.MovieCredits;
 import com.movie.recommender.common.model.movie.MovieKeywords;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 @Slf4j
 public class TmdbApiClient extends ApiClient {
     public TmdbApiClient() {

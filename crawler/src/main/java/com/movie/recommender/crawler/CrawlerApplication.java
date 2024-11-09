@@ -28,6 +28,7 @@ public class CrawlerApplication {
     // Should be removed later.
     private static void getCountryWithCities(ApplicationContext context) {
         MovieService movieService = context.getBean(MovieService.class);
+        //movieService.FetchShowtimesByUserLocations();
         movieService.getCountryWithCities();
     }
 }
