@@ -4,7 +4,9 @@ import com.movie.recommender.common.client.LocationServiceClient;
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.common.model.movie.Movie;
 import com.movie.recommender.common.model.movie.MovieList;
+import com.movie.recommender.crawler.client.SerpApiClient;
 import com.movie.recommender.crawler.client.TmdbApiClient;
+import com.movie.recommender.crawler.model.showtime.MovieShowtimesResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +19,12 @@ import java.util.Optional;
 public class MovieService {
     private final LocationServiceClient locationServiceClient;
     private final TmdbApiClient tmdbApiClient;
+    private final SerpApiClient serpApiClient;
 
-    public MovieService(LocationServiceClient locationServiceClient, TmdbApiClient tmdbApiClient) {
+    public MovieService(LocationServiceClient locationServiceClient) {
         this.locationServiceClient = locationServiceClient;
-        this.tmdbApiClient = tmdbApiClient;
+        this.tmdbApiClient = new TmdbApiClient();
+        this.serpApiClient = new SerpApiClient();
     }
 
     public List<String> parseLocations() {
@@ -43,20 +47,27 @@ public class MovieService {
 
 
 
-    public void FetchShowtimesByUserLocations(){
-        List<String> locations =  parseLocations();
+    public List<Optional<MovieShowtimesResponse>> FetchShowtimesByUserLocations() {
+        List<String> locations = parseLocations();
         List<String> moviesList = new ArrayList<>();
         Optional<MovieList> movies = tmdbApiClient.getNowPlayingMovies();
+        List<Optional<MovieShowtimesResponse>> result = new ArrayList<>();  // Initialize the list here
+        String language = "en";
 
         if (movies.isPresent()) {
             movies.get().getResults().forEach(movie -> moviesList.add(movie.getTitle()));
+            log.info(String.valueOf(moviesList));
 
-            for (Movie movie : movies.get().getResults()) {
-                // Add logic here to handle each movie and location
+            for (String loc : locations) {
+                for (String movieTitle : moviesList) {
+                    result.add(serpApiClient.getMovieShowtimes(movieTitle, loc, language));
+                }
             }
         } else {
             log.info("No movies found");
         }
+        log.info(result.toString());
+        return result;
     }
 
 

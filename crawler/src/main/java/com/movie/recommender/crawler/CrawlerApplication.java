@@ -17,6 +17,7 @@ public class CrawlerApplication {
         log.info("Crawler started");
         initializeMovieData(context);
         getCountryWithCities(context);
+
     }
 
     private static void initializeMovieData(ApplicationContext context) {
@@ -28,7 +29,7 @@ public class CrawlerApplication {
     // Should be removed later.
     private static void getCountryWithCities(ApplicationContext context) {
         MovieService movieService = context.getBean(MovieService.class);
-        //movieService.FetchShowtimesByUserLocations();
+        movieService.FetchShowtimesByUserLocations();
         movieService.getCountryWithCities();
     }
 }

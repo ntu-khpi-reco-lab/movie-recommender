@@ -3,9 +3,11 @@ package com.movie.recommender.crawler.client;
 import com.movie.recommender.lib.http.auth.AuthProvider;
 import com.movie.recommender.lib.http.HttpClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 @Slf4j
 public abstract class ApiClient {
     protected final HttpClient httpClient;

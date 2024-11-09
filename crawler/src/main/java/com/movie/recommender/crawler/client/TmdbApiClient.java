@@ -7,13 +7,20 @@ import com.movie.recommender.common.model.movie.MovieList;
 import com.movie.recommender.common.model.movie.MovieCredits;
 import com.movie.recommender.common.model.movie.MovieKeywords;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
+
+@Component
 @Slf4j
 public class TmdbApiClient extends ApiClient {
+
+    @Value("${tmdb.api.key}")
+    private String apiKey;
+
     public TmdbApiClient() {
         super();
     }
@@ -40,7 +47,7 @@ public class TmdbApiClient extends ApiClient {
 
     @Override
     protected AuthProvider createAuthProvider() {
-        String authToken = getApiKey("TMDB_API_KEY");
+        String authToken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ODg1YzczNjY0ZjNmOWQzZTJlNmE0MTk2Mzk4OThhYiIsIm5iZiI6MTczMTE2Mzg1OS42Mzg5MDUzLCJzdWIiOiI2NzAyZjhmOWM5YTEwZDQ2ZWE3ZDY1MjQiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.pJ_Agld4jedmMIDcaS1TEYIGs4Cew2RgyLvm-8f5vi8";
         return new BearerAuthProvider(authToken);
     }
 }
