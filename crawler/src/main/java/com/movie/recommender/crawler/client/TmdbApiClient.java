@@ -30,8 +30,8 @@ public class TmdbApiClient extends ApiClient {
         return callApi(url, Movie.class);
     }
 
-    public Optional<MovieList> getNowPlayingMovies() {
-        String url = UrlBuilder.nowPlayingMoviesUrl();
+    public Optional<MovieList> getNowPlayingMovies(String region) {
+        String url = UrlBuilder.nowPlayingMoviesUrl(region);
         return callApi(url, MovieList.class);
     }
 
@@ -47,7 +47,7 @@ public class TmdbApiClient extends ApiClient {
 
     @Override
     protected AuthProvider createAuthProvider() {
-        String authToken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ODg1YzczNjY0ZjNmOWQzZTJlNmE0MTk2Mzk4OThhYiIsIm5iZiI6MTczMTE2Mzg1OS42Mzg5MDUzLCJzdWIiOiI2NzAyZjhmOWM5YTEwZDQ2ZWE3ZDY1MjQiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.pJ_Agld4jedmMIDcaS1TEYIGs4Cew2RgyLvm-8f5vi8";
+        String authToken = getApiKey("TMDB_API_KEY");
         return new BearerAuthProvider(authToken);
     }
 }

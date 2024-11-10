@@ -22,7 +22,7 @@ public class SerpApiClient extends ApiClient {
 
     @Override
     protected AuthProvider createAuthProvider() {
-        String apiKey = "9dc14c3ae6901ba9fbc7e0257594425557b53a2399fda39f89ec67c074df9a56";
+        String apiKey = getApiKey("SERP_API_KEY");
         return new ApiKeyAuthProvider(apiKey);
     }
 }
