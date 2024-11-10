@@ -1,21 +1,14 @@
 package com.movie.recommender.crawler.service;
 
 import com.movie.recommender.common.client.LocationServiceClient;
-import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
-import com.movie.recommender.common.model.movie.Movie;
-import com.movie.recommender.common.model.movie.MovieList;
-import com.movie.recommender.common.model.movie.NowPlayingMovieDetail;
+
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
 import com.movie.recommender.crawler.client.SerpApiClient;
 import com.movie.recommender.crawler.client.TmdbApiClient;
-import com.movie.recommender.crawler.model.showtime.MovieShowtimesResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
