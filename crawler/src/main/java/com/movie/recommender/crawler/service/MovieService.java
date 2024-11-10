@@ -11,9 +11,7 @@ import com.movie.recommender.crawler.client.TmdbApiClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -35,28 +33,30 @@ public class MovieService {
         String country = DEFAULT_COUNTRY;
         Optional<NowPlayingMoviesByCountry> nowPlayingMovie = tmdbApiClient.getNowPlayingMovies(country);
         if (nowPlayingMovie.isPresent()) {
+            nowPlayingMovie.get().setCountry(country);
             mongoDBService.insertNowPlayingMovies(nowPlayingMovie.get());
-            log.info("Now playing movies for country '{}' loaded and inserted into MongoDB.", country);
         } else {
             log.warn("No now playing movies found for country '{}'.", country);
         }
-        loadNowPlayingMoviesToMovieDetail(nowPlayingMovie);
+
 
     }
 
-    public void loadNowPlayingMoviesToMovieDetail(Optional<NowPlayingMoviesByCountry> nowPlayingMovie) {
-        if (nowPlayingMovie.isEmpty()) {
-            log.warn("No now playing movies found.");
-            return;
+
+    public void loadMovieDetailsFromNowPlaying() {
+        List<NowPlayingMoviesByCountry> nowPlayingMoviesList = mongoDBService.getNowPlayingMovies();
+
+        Set<Long> movieIds = new HashSet<>();
+        for (NowPlayingMoviesByCountry nowPlayingMovies : nowPlayingMoviesList) {
+            for (NowPlayingMoviesByCountry.MoviesIdResult movie : nowPlayingMovies.getResults()) {
+                movieIds.add(movie.getId());
+            }
         }
 
         List<MovieDetails> movieDetailsList = new ArrayList<>();
-
-        for (NowPlayingMoviesByCountry.MoviesIdResult movie : nowPlayingMovie.get().getResults()) {
-            Long movieId = movie.getId();
+        for (Long movieId : movieIds) {
             log.info("Processing Movie ID: {}", movieId);
 
-            // Загружаем детали фильма
             Optional<MovieDetails> movieDetailsOpt = tmdbApiClient.getMovieDetails(movieId.toString());
             if (movieDetailsOpt.isEmpty()) {
                 log.warn("No details found for movie ID: {}", movieId);
@@ -65,25 +65,22 @@ public class MovieService {
 
             MovieDetails movieDetails = movieDetailsOpt.get();
 
-            // Загружаем актерский состав
             Optional<MovieCredits> creditsOpt = tmdbApiClient.getMovieCredits(movieId.toString());
             creditsOpt.ifPresent(credits -> {
                 movieDetails.setCast(credits.getCast());
                 movieDetails.setCrew(credits.getCrew());
             });
 
-            // Загружаем ключевые слова
             Optional<MovieKeywords> keywordsOpt = tmdbApiClient.getMovieKeywords(movieId.toString());
             keywordsOpt.ifPresent(keywords -> movieDetails.setKeywords(keywords.getKeywords()));
 
-            // Добавляем детали фильма в список
             movieDetailsList.add(movieDetails);
             log.info("Details for movie ID: {} added to the list.", movieId);
         }
 
-        // Вставляем все собранные данные в MongoDB
         mongoDBService.insertMovies(movieDetailsList);
     }
+
 
 
 

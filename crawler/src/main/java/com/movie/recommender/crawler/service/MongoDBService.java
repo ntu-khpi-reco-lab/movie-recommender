@@ -41,36 +41,27 @@ public class MongoDBService {
         }
     }
 
-    public void clearNowPlayingCollection() {
-        try {
-            mongoTemplate.dropCollection("NowPlaying");
-            log.info("Collection 'NowPlaying' cleared successfully.");
-        } catch (MongoException e) {
-            log.error("Error clearing 'NowPlaying' collection: {}", e.getMessage(), e);
-        }
-    }
-
 
 
     public void insertNowPlayingMovies(NowPlayingMoviesByCountry nowPlayingMovies) {
         try {
-            mongoTemplate.dropCollection("NowPlayingByCountry");
+            String country = nowPlayingMovies.getCountry();
+
+            Query query = new Query(Criteria.where("country").is(country));
+            mongoTemplate.remove(query, "NowPlayingByCountry");
+
             mongoTemplate.insert(nowPlayingMovies, "NowPlayingByCountry");
-            log.info("Now playing movies inserted into 'NowPlayingByCountry' collection.");
+            log.info("Now playing movies for country '{}' inserted into 'NowPlayingByCountry' collection.",country);
         } catch (MongoException e) {
-            log.error("Error inserting now playing movies: {}", e.getMessage(), e);
+            log.error("Error inserting now playing movies for country '{}': {}", nowPlayingMovies.getCountry(), e.getMessage(), e);
         }
     }
 
-    public List<NowPlayingMoviesByCountry> getNowPlayingMovies(String country) {
+    public List<NowPlayingMoviesByCountry> getNowPlayingMovies() {
         try {
-            return mongoTemplate.find(
-                    Query.query(Criteria.where("country").is(country)),
-                    NowPlayingMoviesByCountry.class,
-                    "NowPlayingByCountry"
-            );
+            return mongoTemplate.findAll(NowPlayingMoviesByCountry.class, "NowPlayingByCountry");
         } catch (MongoException e) {
-            log.error("Error fetching now playing movies by country: {}", e.getMessage(), e);
+            log.error("Error fetching now playing movies: {}", e.getMessage(), e);
             return List.of();
         }
     }

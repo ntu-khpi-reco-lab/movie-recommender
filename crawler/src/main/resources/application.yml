@@ -17,9 +17,3 @@ spring:
 
 dataset:
   path: C:/3course_project/data/movies.json
-
-
-tmdb:
-  api:
-    key: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ODg1YzczNjY0ZjNmOWQzZTJlNmE0MTk2Mzk4OThhYiIsIm5iZiI6MTczMTE2Mzg1OS42Mzg5MDUzLCJzdWIiOiI2NzAyZjhmOWM5YTEwZDQ2ZWE3ZDY1MjQiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.pJ_Agld4jedmMIDcaS1TEYIGs4Cew2RgyLvm-8f5vi8
-

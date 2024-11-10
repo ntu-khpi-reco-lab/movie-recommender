@@ -4,11 +4,9 @@ import com.movie.recommender.lib.http.auth.ApiKeyAuthProvider;
 import com.movie.recommender.lib.http.auth.AuthProvider;
 import com.movie.recommender.crawler.model.showtime.MovieShowtimesResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@Component
 @Slf4j
 public class SerpApiClient extends ApiClient {
     public SerpApiClient() {
