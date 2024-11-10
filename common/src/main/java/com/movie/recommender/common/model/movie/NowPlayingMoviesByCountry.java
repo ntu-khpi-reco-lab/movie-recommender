@@ -8,7 +8,7 @@ import java.util.List;
 public class NowPlayingMoviesByCountry {
     private String country;
     private Dates dates;
-    private List<NowPlayingMovieDetail> results;
+    private List<MoviesIdResult> results;
 
 
     @Data
@@ -16,5 +16,13 @@ public class NowPlayingMoviesByCountry {
         private String maximum;
         private String minimum;
     }
+
+    @Data
+    public static class MoviesIdResult {
+        private Long id;
+        private String title;
+    }
+
+
 }
 

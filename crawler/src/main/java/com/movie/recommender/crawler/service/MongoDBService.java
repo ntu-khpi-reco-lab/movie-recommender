@@ -50,6 +50,8 @@ public class MongoDBService {
         }
     }
 
+
+
     public void insertNowPlayingMovies(NowPlayingMoviesByCountry nowPlayingMovies) {
         try {
             mongoTemplate.dropCollection("NowPlayingByCountry");

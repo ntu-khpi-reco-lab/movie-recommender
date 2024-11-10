@@ -4,14 +4,11 @@ import com.movie.recommender.common.model.movie.*;
 import com.movie.recommender.lib.http.auth.AuthProvider;
 import com.movie.recommender.lib.http.auth.BearerAuthProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 
-@Component
+
 @Slf4j
 public class TmdbApiClient extends ApiClient {
 
@@ -19,17 +16,12 @@ public class TmdbApiClient extends ApiClient {
         super();
     }
 
-    public Optional<Movie> getMovieDetails(String movieId) {
+    public Optional<MovieDetails> getMovieDetails(String movieId) {
         String url = UrlBuilder.movieDetailsUrl(movieId);
-        return callApi(url, Movie.class);
+        return callApi(url, MovieDetails.class);
     }
 
-    public Optional<MovieList> getNowPlayingMovies(String region) {
-        String url = UrlBuilder.nowPlayingMoviesUrl(region);
-        return callApi(url, MovieList.class);
-    }
-
-    public Optional<NowPlayingMoviesByCountry> getNowPlayingMoviesVar2(String region) {
+    public Optional<NowPlayingMoviesByCountry> getNowPlayingMovies(String region) {
         String url = UrlBuilder.nowPlayingMoviesUrl(region);
         return callApi(url, NowPlayingMoviesByCountry.class);
     }

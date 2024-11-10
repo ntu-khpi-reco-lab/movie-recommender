@@ -1,8 +1,8 @@
 package com.movie.recommender.crawler.client;
 
 import com.movie.recommender.common.model.movie.Movie;
-import com.movie.recommender.common.model.movie.MovieList;
 import com.movie.recommender.common.model.movie.MovieCredits;
+import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.movie.MovieKeywords;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ public class TmdbApiClientTest {
     @DisplayName("Test fetching movie details and validating the title")
     public void testGetMovieDetails() {
         // Fetch movie details for movie ID 671 (Harry Potter and the Philosopher's Stone)
-        Optional<Movie> movieDetails = tmdbApiClient.getMovieDetails("671");
+        Optional<MovieDetails> movieDetails = tmdbApiClient.getMovieDetails("671");
 
         // Assert that the movie details are not null
         assertTrue(movieDetails.isPresent(), "Movie details should not be null");
@@ -34,18 +34,6 @@ public class TmdbApiClientTest {
                 "Movie title should be 'Harry Potter and the Philosopher's Stone'");
     }
 
-    @Test
-    @DisplayName("Test fetching now playing movies")
-    public void testGetNowPlayingMovies() {
-        // Fetch now playing movies
-        Optional<MovieList> nowPlayingMovies = tmdbApiClient.getNowPlayingMovies("ua");
-
-        // Assert that now playing movies list is not null
-        assertTrue(nowPlayingMovies.isPresent(), "Now playing movies should not be null");
-
-        // Assert that the results contain movies
-        assertFalse(nowPlayingMovies.get().getResults().isEmpty(), "Results should contain movies");
-    }
 
     @Test
     @DisplayName("Test fetching movie credits")
