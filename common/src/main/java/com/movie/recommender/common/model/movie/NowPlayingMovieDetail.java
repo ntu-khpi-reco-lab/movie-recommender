@@ -2,7 +2,7 @@ package com.movie.recommender.common.model.movie;
 
 import lombok.Data;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Data
