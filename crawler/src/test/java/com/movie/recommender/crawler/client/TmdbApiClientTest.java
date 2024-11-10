@@ -38,7 +38,7 @@ public class TmdbApiClientTest {
     @DisplayName("Test fetching now playing movies")
     public void testGetNowPlayingMovies() {
         // Fetch now playing movies
-        Optional<MovieList> nowPlayingMovies = tmdbApiClient.getNowPlayingMovies();
+        Optional<MovieList> nowPlayingMovies = tmdbApiClient.getNowPlayingMovies("ua");
 
         // Assert that now playing movies list is not null
         assertTrue(nowPlayingMovies.isPresent(), "Now playing movies should not be null");
