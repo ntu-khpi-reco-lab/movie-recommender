@@ -7,11 +7,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 @Data
-@Document(collection = "NowPlayingByCountry")
 public class NowPlayingMoviesByCountry {
-    @Id
     private String country;
-    private String startDate;
-    private String endDate;
-    private List<NowPlayingMovieDetail> movies;
+    private Dates dates;
+    private List<NowPlayingMovieDetail> results;
+
+
+    @Data
+    public static class Dates {
+        private String maximum;
+        private String minimum;
+    }
 }
+

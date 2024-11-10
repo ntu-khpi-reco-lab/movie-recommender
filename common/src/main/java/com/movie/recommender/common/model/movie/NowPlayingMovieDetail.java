@@ -1,6 +1,8 @@
 package com.movie.recommender.common.model.movie;
 
 import lombok.Data;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,5 +16,5 @@ public class NowPlayingMovieDetail {
     private double popularity;
     private double voteAverage;
     private int voteCount;
-    private List<Movie.Genre> genres;
+    private List<Long> genre_ids;
 }

@@ -33,91 +33,18 @@ public class MovieService {
     }
 
     public void loadNowPlayingMovies() {
-        // Получаем список фильмов типа 'Movie' из TMDB API
-        String country = "UA";
-        Optional<MovieList> movieListOptional = tmdbApiClient.getNowPlayingMovies(country);
+        String country = "ua";
+        Optional<NowPlayingMoviesByCountry> nowPlayingMovie = tmdbApiClient.getNowPlayingMoviesVar2(country);
 
-        if (movieListOptional.isPresent()) {
-            MovieList movieList = movieListOptional.get();
-
-            // Извлекаем даты из ответа API
-            String startDate = movieList.getDates().getMinimum();
-            String endDate = movieList.getDates().getMaximum();
-
-            // Проверяем, есть ли фильмы в ответе
-            if (movieList.getResults() != null && !movieList.getResults().isEmpty()) {
-                List<Movie> movies = movieList.getResults();
-
-                // Преобразуем список 'Movie' в 'NowPlayingMovieDetail'
-                List<NowPlayingMovieDetail> movieDetailsList = movies.stream().map(movie -> {
-                    NowPlayingMovieDetail movieDetail = new NowPlayingMovieDetail();
-                    movieDetail.setId((long) movie.getId());
-                    movieDetail.setTitle(movie.getTitle());
-                    movieDetail.setReleaseDate(movie.getReleaseDate());
-                    movieDetail.setOverview(movie.getOverview());
-                    movieDetail.setPosterPath(movie.getPosterPath());
-                    movieDetail.setBackdropPath(movie.getBackdropPath());
-                    movieDetail.setPopularity(movie.getPopularity());
-                    movieDetail.setVoteAverage(movie.getVoteAverage());
-                    movieDetail.setVoteCount(movie.getVoteCount());
-                    movieDetail.setGenres(movie.getGenres());
-                    return movieDetail;
-                }).collect(Collectors.toList());
-
-                // Создаем объект 'NowPlayingMoviesByCountry'
-                NowPlayingMoviesByCountry nowPlayingMovies = new NowPlayingMoviesByCountry();
-                nowPlayingMovies.setCountry(country);
-                nowPlayingMovies.setStartDate(startDate);
-                nowPlayingMovies.setEndDate(endDate);
-                nowPlayingMovies.setMovies(movieDetailsList);
-
-                // Сохраняем данные в MongoDB
-                mongoDBService.insertNowPlayingMovies(nowPlayingMovies);
-                log.info("Now playing movies loaded for country '{}'", country);
-            } else {
-                log.warn("No now playing movies found for country '{}'", country);
-            }
+        if (nowPlayingMovie.isPresent()) {
+            nowPlayingMovie.get().setCountry(country);
+            mongoDBService.insertNowPlayingMovies(nowPlayingMovie.get());
+            log.info("Now playing movies for country '{}' loaded and inserted into MongoDB.", country);
         } else {
-            log.warn("Failed to fetch now playing movies for country '{}'", country);
+            log.warn("No now playing movies found for country '{}'.", country);
         }
     }
 
-
-    public List<String> parseLocations() {
-        List<CountryWithCitiesDTO> locations = locationServiceClient.getAllCountriesAndCities();
-        List<String> locationStrings = new ArrayList<>();
-        locations.forEach(countryWithCitiesDTO -> {
-            String countryName = countryWithCitiesDTO.getCountryName();
-            countryWithCitiesDTO.getCities().forEach(city -> locationStrings.add(city + " " + countryName));
-        });
-        return locationStrings;
-    }
-
-    public List<Optional<MovieShowtimesResponse>> fetchShowtimesByUserLocations() {
-        List<String> locations = parseLocations();
-        List<Optional<MovieShowtimesResponse>> result = new ArrayList<>();
-        String language = "en";
-
-        // Получаем список "NowPlayingMoviesByCountry"
-        List<NowPlayingMoviesByCountry> nowPlayingMoviesList = mongoDBService.getNowPlayingMovies("UA");
-
-        if (!nowPlayingMoviesList.isEmpty()) {
-            // Извлекаем фильмы из каждого объекта NowPlayingMoviesByCountry
-            for (NowPlayingMoviesByCountry nowPlaying : nowPlayingMoviesList) {
-                List<NowPlayingMovieDetail> moviesList = nowPlaying.getMovies();
-
-                for (String loc : locations) {
-                    for (NowPlayingMovieDetail movie : moviesList) {
-                        log.info("Fetching showtimes for movie '{}' in location '{}'", movie.getTitle(), loc);
-                        result.add(serpApiClient.getMovieShowtimes(movie.getTitle(), loc, language));
-                    }
-                }
-            }
-        } else {
-            log.warn("No 'NowPlaying' movies found for region 'UA'.");
-        }
-        return result;
-    }
 
 
     // For testing purposes. Verify that the country with cities is retrieved.
