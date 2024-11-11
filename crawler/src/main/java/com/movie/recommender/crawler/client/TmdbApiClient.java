@@ -4,13 +4,10 @@ import com.movie.recommender.common.model.movie.*;
 import com.movie.recommender.lib.http.auth.AuthProvider;
 import com.movie.recommender.lib.http.auth.BearerAuthProvider;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.Optional;
-
 
 @Slf4j
 public class TmdbApiClient extends ApiClient {
-
     public TmdbApiClient() {
         super();
     }

@@ -1,17 +1,14 @@
 package com.movie.recommender.crawler.service;
 
 import com.mongodb.MongoException;
-import com.movie.recommender.common.model.movie.Movie;
 import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
 import com.movie.recommender.crawler.repository.MovieRepository;
-import com.movie.recommender.crawler.repository.NowPlayingMovieRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -19,6 +16,7 @@ import java.util.List;
 public class MongoDBService {
     private final MovieRepository movieRepository;
     private final MongoTemplate mongoTemplate;
+    private final String NOW_PLAYING_COLLECTION = "NowPlayingByCountry";
 
     public MongoDBService(MovieRepository movieRepository, MongoTemplate mongoTemplate) {
         this.movieRepository = movieRepository;
@@ -41,25 +39,33 @@ public class MongoDBService {
         }
     }
 
-
+    private void removeOldNowPlayingMovies(String countryCode) {
+        Query query = new Query(Criteria.where("countryCode").is(countryCode));
+        mongoTemplate.remove(query, NOW_PLAYING_COLLECTION);
+        log.info("Old now playing movies for country '{}' removed from '{}'.", countryCode, NOW_PLAYING_COLLECTION);
+    }
 
     public void insertNowPlayingMovies(NowPlayingMoviesByCountry nowPlayingMovies) {
         try {
-            String country = nowPlayingMovies.getCountry();
+            String countryCode = nowPlayingMovies.getCountryCode();
 
-            Query query = new Query(Criteria.where("country").is(country));
-            mongoTemplate.remove(query, "NowPlayingByCountry");
+            removeOldNowPlayingMovies(countryCode);
 
-            mongoTemplate.insert(nowPlayingMovies, "NowPlayingByCountry");
-            log.info("Now playing movies for country '{}' inserted into 'NowPlayingByCountry' collection.",country);
+            mongoTemplate.insert(nowPlayingMovies, NOW_PLAYING_COLLECTION);
+            log.info("Now playing movies for country '{}' inserted into '{}' collection.", countryCode, NOW_PLAYING_COLLECTION);
         } catch (MongoException e) {
-            log.error("Error inserting now playing movies for country '{}': {}", nowPlayingMovies.getCountry(), e.getMessage(), e);
+            log.error("Error inserting now playing movies for country '{}': {}", nowPlayingMovies.getCountryCode(), e.getMessage(), e);
         }
+    }
+
+    public boolean existsMovieById(Long movieId) {
+        Query query = new Query(Criteria.where("id").is(movieId));
+        return mongoTemplate.exists(query, MovieDetails.class);
     }
 
     public List<NowPlayingMoviesByCountry> getNowPlayingMovies() {
         try {
-            return mongoTemplate.findAll(NowPlayingMoviesByCountry.class, "NowPlayingByCountry");
+            return mongoTemplate.findAll(NowPlayingMoviesByCountry.class, NOW_PLAYING_COLLECTION);
         } catch (MongoException e) {
             log.error("Error fetching now playing movies: {}", e.getMessage(), e);
             return List.of();

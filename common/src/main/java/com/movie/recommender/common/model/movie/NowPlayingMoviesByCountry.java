@@ -1,28 +1,24 @@
 package com.movie.recommender.common.model.movie;
 
 import lombok.Data;
-
 import java.util.List;
 
 @Data
 public class NowPlayingMoviesByCountry {
-    private String country;
-    private Dates dates;
-    private List<MoviesIdResult> results;
-
+    private String countryCode;
+    private DateRange dateRange;
+    private List<MovieIdentifier> results;
 
     @Data
-    public static class Dates {
-        private String maximum;
-        private String minimum;
+    public static class DateRange {
+        private String startDate;
+        private String endDate;
     }
 
     @Data
-    public static class MoviesIdResult {
+    public static class MovieIdentifier {
         private Long id;
         private String title;
     }
-
-
 }
 

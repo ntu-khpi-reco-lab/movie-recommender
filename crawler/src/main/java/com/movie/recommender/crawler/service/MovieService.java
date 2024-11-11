@@ -2,6 +2,7 @@ package com.movie.recommender.crawler.service;
 
 import com.movie.recommender.common.client.LocationServiceClient;
 
+import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.common.model.movie.MovieCredits;
 import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.movie.MovieKeywords;
@@ -20,7 +21,6 @@ public class MovieService {
     private final TmdbApiClient tmdbApiClient;
     private final SerpApiClient serpApiClient;
     private final MongoDBService mongoDBService;
-    private final String DEFAULT_COUNTRY = "ua";
 
     public MovieService(LocationServiceClient locationServiceClient, MongoDBService mongoDBService) {
         this.locationServiceClient = locationServiceClient;
@@ -30,70 +30,82 @@ public class MovieService {
     }
 
     public void loadNowPlayingMovies() {
-        String country = DEFAULT_COUNTRY;
-        Optional<NowPlayingMoviesByCountry> nowPlayingMovie = tmdbApiClient.getNowPlayingMovies(country);
-        if (nowPlayingMovie.isPresent()) {
-            nowPlayingMovie.get().setCountry(country);
-            mongoDBService.insertNowPlayingMovies(nowPlayingMovie.get());
-        } else {
-            log.warn("No now playing movies found for country '{}'.", country);
-        }
+        Map<String, String> countryCodeMapping = Map.of(
+                "Ukraine", "ua"
+        );
 
+        List<CountryWithCitiesDTO> countries = locationServiceClient.getAllCountriesAndCities();
 
-    }
+        List<NowPlayingMoviesByCountry> nowPlayingMoviesList = new ArrayList<>();
 
+        for (CountryWithCitiesDTO countryWithCities : countries) {
+            String countryName = countryWithCities.getCountryName();
+            String countryCode = countryCodeMapping.get(countryName);
 
-    public void loadMovieDetailsFromNowPlaying() {
-        List<NowPlayingMoviesByCountry> nowPlayingMoviesList = mongoDBService.getNowPlayingMovies();
-
-        Set<Long> movieIds = new HashSet<>();
-        for (NowPlayingMoviesByCountry nowPlayingMovies : nowPlayingMoviesList) {
-            for (NowPlayingMoviesByCountry.MoviesIdResult movie : nowPlayingMovies.getResults()) {
-                movieIds.add(movie.getId());
-            }
-        }
-
-        List<MovieDetails> movieDetailsList = new ArrayList<>();
-        for (Long movieId : movieIds) {
-            log.info("Processing Movie ID: {}", movieId);
-
-            Optional<MovieDetails> movieDetailsOpt = tmdbApiClient.getMovieDetails(movieId.toString());
-            if (movieDetailsOpt.isEmpty()) {
-                log.warn("No details found for movie ID: {}", movieId);
+            if (countryCode == null) {
+                log.warn("Country code not found for country '{}'. Skipping...", countryName);
                 continue;
             }
 
-            MovieDetails movieDetails = movieDetailsOpt.get();
+            log.info("Loading now playing movies for country '{}'", countryName);
 
-            Optional<MovieCredits> creditsOpt = tmdbApiClient.getMovieCredits(movieId.toString());
-            creditsOpt.ifPresent(credits -> {
-                movieDetails.setCast(credits.getCast());
-                movieDetails.setCrew(credits.getCrew());
-            });
-
-            Optional<MovieKeywords> keywordsOpt = tmdbApiClient.getMovieKeywords(movieId.toString());
-            keywordsOpt.ifPresent(keywords -> movieDetails.setKeywords(keywords.getKeywords()));
-
-            movieDetailsList.add(movieDetails);
-            log.info("Details for movie ID: {} added to the list.", movieId);
+            Optional<NowPlayingMoviesByCountry> nowPlayingMovie = tmdbApiClient.getNowPlayingMovies(countryCode);
+            if (nowPlayingMovie.isPresent()) {
+                nowPlayingMovie.get().setCountryCode(countryCode);
+                mongoDBService.insertNowPlayingMovies(nowPlayingMovie.get());
+                nowPlayingMoviesList.add(nowPlayingMovie.get());
+                log.info("Now playing movies for country '{}' inserted into MongoDB.", countryName);
+            } else {
+                log.warn("No now playing movies found for country '{}'.", countryName);
+            }
         }
 
+        // Process movie details for all now playing movies
+        processNowPlayingMoviesDetails(nowPlayingMoviesList);
+    }
+
+
+    public void processNowPlayingMoviesDetails(List<NowPlayingMoviesByCountry> nowPlayingMoviesList) {
+        List<MovieDetails> movieDetailsList = new ArrayList<>();
+
+        for (NowPlayingMoviesByCountry nowPlayingMovies : nowPlayingMoviesList) {
+            for (NowPlayingMoviesByCountry.MovieIdentifier movie : nowPlayingMovies.getResults()) {
+                Long movieId = movie.getId();
+
+                // Check if the movie already exists in MongoDB
+                if (mongoDBService.existsMovieById(movieId)) {
+                    log.info("Movie ID: {} already exists in MongoDB. Skipping...", movieId);
+                    continue;
+                }
+
+                log.info("Processing Movie ID: {}", movieId);
+
+                // Load movie details
+                Optional<MovieDetails> movieDetailsOpt = tmdbApiClient.getMovieDetails(movieId.toString());
+                if (movieDetailsOpt.isEmpty()) {
+                    log.warn("No details found for movie ID: {}", movieId);
+                    continue;
+                }
+
+                MovieDetails movieDetails = movieDetailsOpt.get();
+
+                // Load movie credits
+                Optional<MovieCredits> creditsOpt = tmdbApiClient.getMovieCredits(movieId.toString());
+                creditsOpt.ifPresent(credits -> {
+                    movieDetails.setCast(credits.getCast());
+                    movieDetails.setCrew(credits.getCrew());
+                });
+
+                // Load movie keywords
+                Optional<MovieKeywords> keywordsOpt = tmdbApiClient.getMovieKeywords(movieId.toString());
+                keywordsOpt.ifPresent(keywords -> movieDetails.setKeywords(keywords.getKeywords()));
+
+                // Add movie details to the list
+                movieDetailsList.add(movieDetails);
+                log.info("Details for movie ID: {} added to the list.", movieId);
+            }
+        }
         mongoDBService.insertMovies(movieDetailsList);
+        log.info("All movie details inserted into the 'movies' collection.");
     }
-
-
-
-
-    // For testing purposes. Verify that the country with cities is retrieved.
-    // Should be removed later.
-    public void getCountryWithCities() {
-        log.info("Getting country with cities...");
-        locationServiceClient.getAllCountriesAndCities().forEach(countryWithCitiesDTO -> {
-            log.info("Country: {}", countryWithCitiesDTO.getCountryName());
-            countryWithCitiesDTO.getCities().forEach(city -> log.info("City: {}", city));
-        });
-    }
-
-
-
 }

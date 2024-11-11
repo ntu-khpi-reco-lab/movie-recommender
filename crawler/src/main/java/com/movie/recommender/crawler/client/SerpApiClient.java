@@ -4,7 +4,6 @@ import com.movie.recommender.lib.http.auth.ApiKeyAuthProvider;
 import com.movie.recommender.lib.http.auth.AuthProvider;
 import com.movie.recommender.crawler.model.showtime.MovieShowtimesResponse;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.Optional;
 
 @Slf4j
