@@ -25,10 +25,10 @@ public class CrawlerApplication {
         dataInitializer.initializeData();
     }
 
-    //test function
     private static void loadNowPlayingMovies(ApplicationContext context) {
             MovieService movieService = context.getBean(MovieService.class);
             movieService.loadNowPlayingMovies();
+            movieService.loadShowtimes();
     }
 
 }
