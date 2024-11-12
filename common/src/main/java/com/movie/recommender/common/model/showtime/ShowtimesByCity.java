@@ -7,11 +7,11 @@ import java.util.List;
 public class ShowtimesByCity {
     private String countryCode;
     private String cityName;
-    private List<MovieIdentifier> movies;
+    private List<MovieShowtimes> movies;
 
 
     @Data
-    public static class MovieIdentifier {
+    public static class MovieShowtimes {
         private Long id;
         private String title;
         private List<Showtime> showtimes;
