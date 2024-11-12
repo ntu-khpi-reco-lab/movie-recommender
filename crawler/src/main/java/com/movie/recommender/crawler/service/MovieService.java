@@ -25,7 +25,6 @@ public class MovieService {
     private final MongoDBService mongoDBService;
     private final Map<String, String> countryCodeMapping = Map.of("Ukraine", "ua");
     private static final int API_CALL_LIMIT = 3;
-    int apiCallCount = 0;
 
     public MovieService(LocationServiceClient locationServiceClient, MongoDBService mongoDBService) {
         this.locationServiceClient = locationServiceClient;
@@ -47,52 +46,45 @@ public class MovieService {
 
             log.info("Processing country '{}'", countryName);
 
-            NowPlayingMoviesByCountry movies = fetchNowPlayingMoviesForCountry(country);
-            if (apiCallCount < API_CALL_LIMIT) {
-                log.info("Reached the limit of {} API calls. Saving collected data and exiting.", API_CALL_LIMIT);
-                processCountryShowtimes(country, movies);
-            }
+            NowPlayingMoviesByCountry movies = fetchNowPlayingMoviesForCountry(countryCode);
+            processCountryShowtimes(country, movies);
+
         }
     }
 
 
-    private NowPlayingMoviesByCountry fetchNowPlayingMoviesForCountry(CountryWithCitiesDTO country) {
-        String countryName = country.getCountryName();
-        String countryCode = countryCodeMapping.get(countryName);
+    private NowPlayingMoviesByCountry fetchNowPlayingMoviesForCountry(String countryCode) {
 
-        log.info("Loading now playing movies for country '{}'", countryName);
+
+        log.info("Loading now playing movies for country '{}'", countryCode);
 
         Optional<NowPlayingMoviesByCountry> nowPlayingMovie = tmdbApiClient.getNowPlayingMovies(countryCode);
         if (nowPlayingMovie.isPresent()) {
             nowPlayingMovie.get().setCountryCode(countryCode);
             mongoDBService.insertNowPlayingMovies(nowPlayingMovie.get());
-            log.info("Now playing movies for country '{}' inserted into MongoDB.", countryName);
+            processNowPlayingMoviesDetails(nowPlayingMovie.get());
+            log.info("Now playing movies for country '{}' inserted into MongoDB.", countryCode);
         } else {
-            log.warn("No now playing movies found for country '{}'.", countryName);
+            log.warn("No now playing movies found for country '{}'.", countryCode);
         }
 
-        processNowPlayingMoviesDetails(nowPlayingMovie);
         return nowPlayingMovie.get();
     }
 
 
-    public void processNowPlayingMoviesDetails(Optional<NowPlayingMoviesByCountry> nowPlayingMovie) {
+    public void processNowPlayingMoviesDetails(NowPlayingMoviesByCountry nowPlayingMovie) {
         List<MovieDetails> movieDetailsList = new ArrayList<>();
 
-        for (NowPlayingMoviesByCountry.MovieIdentifier movie : nowPlayingMovie.get().getResults()) {
-            // Fetch movie details using the new method
+        for (NowPlayingMoviesByCountry.MovieIdentifier movie : nowPlayingMovie.getResults()) {
             Optional<MovieDetails> movieDetailsOpt = fetchMovieDetails(movie.getId());
             movieDetailsOpt.ifPresent(movieDetailsList::add);
         }
 
-
-        // Insert all collected movie details into MongoDB
         mongoDBService.insertMovies(movieDetailsList);
         log.info("All movie details inserted into the 'movies' collection.");
     }
 
     private Optional<MovieDetails> fetchMovieDetails(Long movieId) {
-        // Check if the movie already exists in MongoDB
         if (mongoDBService.existsMovieById(movieId)) {
             log.info("Movie ID: {} already exists in MongoDB. Skipping...", movieId);
             return Optional.empty();
@@ -109,14 +101,12 @@ public class MovieService {
 
         MovieDetails movieDetails = movieDetailsOpt.get();
 
-        // Load movie credits
         Optional<MovieCredits> creditsOpt = tmdbApiClient.getMovieCredits(movieId.toString());
         creditsOpt.ifPresent(credits -> {
             movieDetails.setCast(credits.getCast());
             movieDetails.setCrew(credits.getCrew());
         });
 
-        // Load movie keywords
         Optional<MovieKeywords> keywordsOpt = tmdbApiClient.getMovieKeywords(movieId.toString());
         keywordsOpt.ifPresent(keywords -> movieDetails.setKeywords(keywords.getKeywords()));
 
@@ -124,59 +114,33 @@ public class MovieService {
     }
 
     private void processCountryShowtimes(CountryWithCitiesDTO country, NowPlayingMoviesByCountry nowPlayingMoviesByCountry) {
-        List<ShowtimesByCity> allShowtimes = new ArrayList<>();
-
-        String countryName = country.getCountryName();
         String countryCode = nowPlayingMoviesByCountry.getCountryCode();
 
-        if (countryCode == null) {
-            log.warn("Country code not found for country '{}'. Skipping...", countryName);
-            return;
-        }
+        log.info("Loading showtimes for country '{}'", countryCode);
 
-        log.info("Loading showtimes for country '{}'", countryName);
-
-        // Перебираем города страны
         for (String cityName : country.getCities()) {
-            if (apiCallCount >= API_CALL_LIMIT) {
-                log.info("Reached the limit of {} API calls. Exiting city loop.", API_CALL_LIMIT);
-                break;
-            }
-
             ShowtimesByCity showtimesByCity = new ShowtimesByCity();
             showtimesByCity.setCountryCode(countryCode);
             showtimesByCity.setCityName(cityName);
 
-            // Получаем список сеансов для фильмов в текущем городе
             List<ShowtimesByCity.MovieShowtimes> movieList = processMovies(nowPlayingMoviesByCountry.getResults(), cityName);
 
-            // Добавляем фильмы города в список
             showtimesByCity.setMovies(movieList);
-            allShowtimes.add(showtimesByCity);
+            mongoDBService.insertShowtimes(showtimesByCity);
         }
 
-        // Сохраняем все собранные данные в MongoDB
-        if (!allShowtimes.isEmpty()) {
-            log.info("Saving collected showtimes data for country '{}'.", countryName);
-            saveShowtimes(allShowtimes);
-        } else {
-            log.warn("No showtimes data collected for country '{}'. Skipping save operation.", countryName);
-        }
     }
 
     private List<ShowtimesByCity.MovieShowtimes> processMovies(List<NowPlayingMoviesByCountry.MovieIdentifier> movies, String cityName) {
         List<ShowtimesByCity.MovieShowtimes> movieList = new ArrayList<>();
-
+        int apiCallCount = 0;
         for (NowPlayingMoviesByCountry.MovieIdentifier movie : movies) {
             if (apiCallCount >= API_CALL_LIMIT) {
                 log.info("Reached the limit of {} API calls. Exiting movie loop.", API_CALL_LIMIT);
                 break;
             }
-
-            // Получаем объект MovieShowtimes для текущего фильма
             ShowtimesByCity.MovieShowtimes showtimeMovie = fetchMovieShowtimes(movie, cityName);
 
-            // Если расписание успешно загружено, добавляем в список
             if (showtimeMovie != null) {
                 movieList.add(showtimeMovie);
                 apiCallCount++;
@@ -199,13 +163,5 @@ public class MovieService {
         }
 
         return null;
-    }
-
-
-    // Метод для сохранения данных в MongoDB
-    private void saveShowtimes(List<ShowtimesByCity> allShowtimes) {
-        for (ShowtimesByCity showtimes : allShowtimes) {
-            mongoDBService.insertShowtimes(showtimes);
-        }
     }
 }
