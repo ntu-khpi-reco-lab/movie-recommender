@@ -115,6 +115,7 @@ public class MovieService {
 
     private void processCountryShowtimes(CountryWithCitiesDTO country, NowPlayingMoviesByCountry nowPlayingMoviesByCountry) {
         String countryCode = nowPlayingMoviesByCountry.getCountryCode();
+        String countryName = country.getCountryName();
 
         log.info("Loading showtimes for country '{}'", countryCode);
 
@@ -123,7 +124,7 @@ public class MovieService {
             showtimesByCity.setCountryCode(countryCode);
             showtimesByCity.setCityName(cityName);
 
-            List<ShowtimesByCity.MovieShowtimes> movieList = processMovies(nowPlayingMoviesByCountry.getResults(), cityName);
+            List<ShowtimesByCity.MovieShowtimes> movieList = processMovies(nowPlayingMoviesByCountry.getResults(), cityName,countryName);
 
             showtimesByCity.setMovies(movieList);
             mongoDBService.insertShowtimes(showtimesByCity);
@@ -131,7 +132,7 @@ public class MovieService {
 
     }
 
-    private List<ShowtimesByCity.MovieShowtimes> processMovies(List<NowPlayingMoviesByCountry.MovieIdentifier> movies, String cityName) {
+    private List<ShowtimesByCity.MovieShowtimes> processMovies(List<NowPlayingMoviesByCountry.MovieIdentifier> movies, String cityName, String country) {
         List<ShowtimesByCity.MovieShowtimes> movieList = new ArrayList<>();
         int apiCallCount = 0;
         for (NowPlayingMoviesByCountry.MovieIdentifier movie : movies) {
@@ -139,14 +140,14 @@ public class MovieService {
                 log.info("Reached the limit of {} API calls. Exiting movie loop.", API_CALL_LIMIT);
                 break;
             }
-            ShowtimesByCity.MovieShowtimes showtimeMovie = fetchMovieShowtimes(movie, cityName);
+            String cityWithCountryName =country + "," + cityName ;
+            ShowtimesByCity.MovieShowtimes showtimeMovie = fetchMovieShowtimes(movie, cityWithCountryName);
 
             if (showtimeMovie != null) {
                 movieList.add(showtimeMovie);
                 apiCallCount++;
             }
         }
-
         return movieList;
     }
 
