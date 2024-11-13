@@ -3,7 +3,6 @@ package com.movie.recommender.crawler.client;
 import com.movie.recommender.lib.http.auth.AuthProvider;
 import com.movie.recommender.lib.http.HttpClient;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.Optional;
 
 @Slf4j

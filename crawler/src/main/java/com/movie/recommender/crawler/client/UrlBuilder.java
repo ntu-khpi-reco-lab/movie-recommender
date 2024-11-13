@@ -11,8 +11,8 @@ public class UrlBuilder {
         return BASE_TMDB_URL + "/movie/" + movieId;
     }
 
-    public static String nowPlayingMoviesUrl() {
-        return BASE_TMDB_URL + "/movie/now_playing";
+    public static String nowPlayingMoviesUrl(String region) {
+        return BASE_TMDB_URL + "/movie/now_playing?region=" + encode(region);
     }
 
     public static String movieCreditsUrl(String movieId) {

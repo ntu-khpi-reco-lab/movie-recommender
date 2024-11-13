@@ -16,7 +16,8 @@ public class CrawlerApplication {
         ApplicationContext context = SpringApplication.run(CrawlerApplication.class, args);
         log.info("Crawler started");
         initializeMovieData(context);
-        getCountryWithCities(context);
+        loadNowPlayingMovies(context);
+
     }
 
     private static void initializeMovieData(ApplicationContext context) {
@@ -24,10 +25,9 @@ public class CrawlerApplication {
         dataInitializer.initializeData();
     }
 
-    // For testing purposes. Verify that the country with cities is retrieved.
-    // Should be removed later.
-    private static void getCountryWithCities(ApplicationContext context) {
-        MovieService movieService = context.getBean(MovieService.class);
-        movieService.getCountryWithCities();
+    private static void loadNowPlayingMovies(ApplicationContext context) {
+            MovieService movieService = context.getBean(MovieService.class);
+            movieService.processCountryMovies();
     }
+
 }

@@ -1,13 +1,9 @@
 package com.movie.recommender.crawler.client;
 
+import com.movie.recommender.common.model.movie.*;
 import com.movie.recommender.lib.http.auth.AuthProvider;
 import com.movie.recommender.lib.http.auth.BearerAuthProvider;
-import com.movie.recommender.common.model.movie.Movie;
-import com.movie.recommender.common.model.movie.MovieList;
-import com.movie.recommender.common.model.movie.MovieCredits;
-import com.movie.recommender.common.model.movie.MovieKeywords;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.Optional;
 
 @Slf4j
@@ -16,14 +12,14 @@ public class TmdbApiClient extends ApiClient {
         super();
     }
 
-    public Optional<Movie> getMovieDetails(String movieId) {
+    public Optional<MovieDetails> getMovieDetails(String movieId) {
         String url = UrlBuilder.movieDetailsUrl(movieId);
-        return callApi(url, Movie.class);
+        return callApi(url, MovieDetails.class);
     }
 
-    public Optional<MovieList> getNowPlayingMovies() {
-        String url = UrlBuilder.nowPlayingMoviesUrl();
-        return callApi(url, MovieList.class);
+    public Optional<NowPlayingMoviesByCountry> getNowPlayingMovies(String region) {
+        String url = UrlBuilder.nowPlayingMoviesUrl(region);
+        return callApi(url, NowPlayingMoviesByCountry.class);
     }
 
     public Optional<MovieCredits> getMovieCredits(String movieId) {
