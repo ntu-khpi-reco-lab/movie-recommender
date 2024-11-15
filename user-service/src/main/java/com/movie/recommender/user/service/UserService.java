@@ -1,6 +1,5 @@
 package com.movie.recommender.user.service;
 
-import com.movie.recommender.user.exception.MovieNotFoundException;
 import com.movie.recommender.user.exception.UserAlreadyExistsException;
 import com.movie.recommender.user.security.JwtUtil;
 import com.movie.recommender.user.exception.UserNotFoundException;
@@ -59,43 +58,4 @@ public class UserService {
             throw new IllegalArgumentException("Invalid credentials");
         }
     }
-
-    public Set<Long> getFavoriteMovies(Long userId) {
-        log.info("Attempting to get favorite movies for user with id: {}", userId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
-        return user.getFavoriteMovies();
-    }
-
-    public void addFavoriteMovies(Long userId, List<Long> movieIds) {
-        log.info("Attempting to add favorite movies for user with id: {}", userId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
-
-        user.getFavoriteMovies().addAll(movieIds);
-        userRepository.save(user);
-    }
-
-    public void removeFavoriteMovies(Long userId, List<Long> movieIds) {
-        log.info("Attempting to remove favorite movies for user with id: {}", userId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
-
-        user.getFavoriteMovies().removeAll(movieIds);
-        userRepository.save(user);
-    }
-
-    public void removeFavoriteMovie(Long userId, Long movieId) {
-        log.info("Attempting to remove favorite movie for user with id: {}", userId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
-
-        boolean removed = user.getFavoriteMovies().remove(movieId);
-        if (!removed) {
-            throw new MovieNotFoundException("Movie not found in favorites, id: " + movieId);
-        }
-
-        userRepository.save(user);
-    }
-
 }

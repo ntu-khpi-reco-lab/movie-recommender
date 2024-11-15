@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddFavoriteMoviesDTO {
+public class FavoriteMoviesDTO {
     private List<Long> movieIds;
 }
