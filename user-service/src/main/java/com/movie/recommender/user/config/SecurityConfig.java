@@ -21,7 +21,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/users/register", "/api/v1/users/login").permitAll()
+                        .requestMatchers("/api/v1/users/register", "/api/v1/users/login", "/api/v1/users/{userId}/favorites").permitAll()
                         .anyRequest().authenticated());
 
         return http.build();
