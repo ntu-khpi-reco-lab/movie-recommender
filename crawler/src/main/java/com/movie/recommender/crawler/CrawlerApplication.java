@@ -16,7 +16,7 @@ public class CrawlerApplication {
         ApplicationContext context = SpringApplication.run(CrawlerApplication.class, args);
         log.info("Crawler started");
         initializeMovieData(context);
-        //loadNowPlayingMovies(context);
+        loadNowPlayingMovies(context);
 
     }
 
@@ -27,7 +27,7 @@ public class CrawlerApplication {
 
     private static void loadNowPlayingMovies(ApplicationContext context) {
             MovieService movieService = context.getBean(MovieService.class);
-            movieService.processCountryMovies();
+            //movieService.processCountryMovies();
     }
 
 }
