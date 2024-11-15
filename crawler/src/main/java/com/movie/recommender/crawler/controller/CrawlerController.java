@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/internal")
+@RequestMapping("/api/v1/internal/crawl")
 @Slf4j
 public class CrawlerController {
 
@@ -17,7 +17,6 @@ public class CrawlerController {
         this.movieService = movieService;
     }
 
-    @PostMapping("/crawl")
     public ResponseEntity<String> triggerCrawl() {
         try {
             log.info("Manual crawl process initiated.");
