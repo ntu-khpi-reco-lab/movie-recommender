@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController("/api/v1/internal/crawl")
 @Slf4j
 public class CrawlerController {
 
@@ -15,7 +15,7 @@ public class CrawlerController {
         this.movieService = movieService;
     }
 
-    @PostMapping("/api/v1/internal/crawl")
+    @PostMapping
     public ResponseEntity<String> triggerCrawl() {
         try {
             log.info("Manual crawl process initiated.");

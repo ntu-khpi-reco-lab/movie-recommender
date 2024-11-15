@@ -27,7 +27,7 @@ public class CrawlerApplication {
 
     private static void loadNowPlayingMovies(ApplicationContext context) {
             MovieService movieService = context.getBean(MovieService.class);
-            //movieService.processCountryMovies();
+            movieService.processCountryMovies();
     }
 
 }
