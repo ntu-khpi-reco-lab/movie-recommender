@@ -15,7 +15,7 @@ public class CrawlerController {
         this.movieService = movieService;
     }
 
-    @PostMapping("/api/v1/internal/crawl")
+    @RequestMapping("/api/v1/internal/crawl")
     public ResponseEntity<String> triggerCrawl() {
         try {
             log.info("Manual crawl process initiated.");
