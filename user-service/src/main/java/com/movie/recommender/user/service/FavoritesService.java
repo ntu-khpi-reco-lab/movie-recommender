@@ -6,7 +6,6 @@ import com.movie.recommender.user.model.entity.User;
 import com.movie.recommender.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +16,10 @@ import java.util.Set;
 public class FavoritesService {
     private final UserRepository userRepository;
 
-    @Autowired
     public FavoritesService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    @Transactional
     public Set<Long> getFavoriteMovies(Long userId) {
         log.info("Attempting to get favorite movies for user with id: {}", userId);
         User user = findUserById(userId);
