@@ -22,7 +22,7 @@ public class CrawlerController {
 
             movieService.processCountryMovies();
 
-            log.info("Crawl process completed successfully.");
+            log.info("Crawl process started successfully.");
             return ResponseEntity.ok("Crawl process completed successfully.");
         } catch (Exception e) {
             log.error("Error during crawl process: {}", e.getMessage(), e);
