@@ -1,7 +1,6 @@
 package com.movie.recommender.crawler;
 
 import com.movie.recommender.crawler.dataimport.MovieDataInitializer;
-import com.movie.recommender.crawler.service.MovieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,20 +15,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class CrawlerApplication {
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(CrawlerApplication.class, args);
-        log.info("Crawler started");
+        log.info("Crawler application started successfully");
         initializeMovieData(context);
-        loadNowPlayingMovies(context);
-
     }
 
     private static void initializeMovieData(ApplicationContext context) {
+        log.info("Initializing movie data");
         MovieDataInitializer dataInitializer = context.getBean(MovieDataInitializer.class);
         dataInitializer.initializeData();
     }
-
-    private static void loadNowPlayingMovies(ApplicationContext context) {
-            MovieService movieService = context.getBean(MovieService.class);
-            movieService.processCountryMovies();
-    }
-
 }

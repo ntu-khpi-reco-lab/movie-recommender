@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/internal/crawl")
 @Slf4j
 public class CrawlerController {
-
     private final MovieService movieService;
 
     public CrawlerController(MovieService movieService) {
@@ -20,11 +19,8 @@ public class CrawlerController {
     public ResponseEntity<String> triggerCrawl() {
         try {
             log.info("Manual crawl process initiated.");
-
             movieService.processCountryMovies();
-
-            log.info("Crawl process started successfully.");
-            return ResponseEntity.ok("Crawl process completed successfully.");
+            return ResponseEntity.ok("Crawl process started successfully.");
         } catch (Exception e) {
             log.error("Error during crawl process: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body("An error occurred during the crawl process.");
