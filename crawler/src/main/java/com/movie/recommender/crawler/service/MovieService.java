@@ -10,13 +10,11 @@ import com.movie.recommender.crawler.client.TmdbApiClient;
 import com.movie.recommender.crawler.model.showtime.MovieShowtimesResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-@EnableAsync
 @Slf4j
 public class MovieService {
     private final LocationServiceClient locationServiceClient;
