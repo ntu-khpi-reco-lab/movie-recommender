@@ -23,8 +23,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/users/register",
                                 "/api/v1/users/login",
-                                "/api/v1/favorites/{userId}",
-                                "/api/v1/favorites/{userId}/{movieId}").permitAll()
+                                "/api/v1/favorites/**").permitAll()
                         .anyRequest().authenticated());
 
         return http.build();
