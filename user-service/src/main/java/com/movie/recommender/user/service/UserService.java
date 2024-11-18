@@ -66,11 +66,7 @@ public class UserService {
         log.info("Attempting to update profile info for user with id: {}", userId);
 
         User user = findUserById(userId);
-        if (userUpdateDTO.getUsername() != null) user.setUsername(userUpdateDTO.getUsername());
-        if (userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
-        if (userUpdateDTO.getFirstName() != null) user.setFirstName(userUpdateDTO.getFirstName());
-        if (userUpdateDTO.getLastName() != null) user.setLastName(userUpdateDTO.getLastName());
-        if (userUpdateDTO.getPassword() != null) user.setPassword(userUpdateDTO.getPassword());
+        UpdateUser(userUpdateDTO, user);
 
         userRepository.save(user);
         return UserDTO.toDTO(user);
@@ -86,5 +82,13 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
         return user;
+    }
+
+    private void UpdateUser(UserUpdateDTO userUpdateDTO, User user) {
+        if (userUpdateDTO.getUsername() != null) user.setUsername(userUpdateDTO.getUsername());
+        if (userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
+        if (userUpdateDTO.getFirstName() != null) user.setFirstName(userUpdateDTO.getFirstName());
+        if (userUpdateDTO.getLastName() != null) user.setLastName(userUpdateDTO.getLastName());
+        if (userUpdateDTO.getPassword() != null) user.setPassword(userUpdateDTO.getPassword());
     }
 }
