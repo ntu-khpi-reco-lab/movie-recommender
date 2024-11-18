@@ -28,5 +28,23 @@ public class UserController {
         String token = userService.login(userLoginDTO.getUsername(), userLoginDTO.getPassword());
         return ResponseEntity.ok(token);
     }
+
+    @GetMapping("/{userId}/profile")
+    public ResponseEntity<UserDTO> getUserProfile(@PathVariable("userId") Long userId) {
+        UserDTO userDTO = userService.getUserProfile(userId);
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @PutMapping("/{userId}/profile")
+    public ResponseEntity<UserDTO> updateUserProfile(@PathVariable("userId") Long userId, @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+        UserDTO userDTO = userService.updateUserProfile(userId, userUpdateDTO);
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @DeleteMapping("/{userId}/profile")
+    public ResponseEntity<Void> deleteUserProfile(@PathVariable("userId") Long userId) {
+        userService.deleteUserProfile(userId);
+        return ResponseEntity.noContent().build();
+    }
 }
 
