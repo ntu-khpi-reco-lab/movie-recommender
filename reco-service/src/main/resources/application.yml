@@ -1,0 +1,11 @@
+server:
+  port: 9006  # Crawler runs on port 9004
+
+service:
+  location:
+    service:
+      url: http://localhost:9006
+
+spring:
+  application:
+    name: reco-service
