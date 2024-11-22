@@ -16,4 +16,15 @@ spring:
       database: movieDB
 
 dataset:
-  path: C:/3course_project/data/movies.json
+  path: /data/movies.json
+
+# Docker-specific configuration
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  data:
+    mongodb:
+      uri: mongodb://user:pass@mongodb:27017
+      database: movieDB

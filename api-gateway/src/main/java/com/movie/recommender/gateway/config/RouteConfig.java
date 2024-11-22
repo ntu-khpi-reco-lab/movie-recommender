@@ -24,6 +24,13 @@ public class RouteConfig {
                                         .setName("user-service-cb")
                                         .setFallbackUri("forward:/users")))
                         .uri("http://user-service:9002"))  // Ensure the port matches the User Service
+                .route("search-service", r -> r
+                        .path("/api/v1/search/**")
+                        .filters(f -> f
+                                .circuitBreaker(config -> config
+                                        .setName("search-service-cb")
+                                        .setFallbackUri("forward:/search")))
+                        .uri("http://search-service:9005"))  // Ensure the port matches the Search Service
                 .build();
     }
 }

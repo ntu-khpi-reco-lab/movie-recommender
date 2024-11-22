@@ -8,3 +8,14 @@ spring:
     mongodb:
       uri: mongodb://user:pass@localhost:27017
       database: movieDB
+
+# Docker-specific configuration
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  data:
+    mongodb:
+      uri: mongodb://user:pass@mongodb:27017
+      database: movieDB
