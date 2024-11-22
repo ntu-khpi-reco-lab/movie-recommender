@@ -1,8 +1,10 @@
 package com.movie.recommender.location.controller;
 
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
+import com.movie.recommender.location.config.RabbitMQConfig;
 import com.movie.recommender.location.service.LocationService;
 import com.movie.recommender.location.model.dto.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -17,14 +19,17 @@ import java.util.List;
 public class LocationController {
 
     private final LocationService locationService;
+    private final RabbitTemplate rabbitTemplate;
 
-    public LocationController(LocationService locationService) {
+    public LocationController(LocationService locationService, RabbitTemplate rabbitTemplate) {
         this.locationService = locationService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @PostMapping
     public ResponseEntity<LocationDTO> createLocation(@RequestBody @Valid LocationCreateDTO locationCreateDTO) {
         LocationDTO savedLocation = locationService.saveLocation(locationCreateDTO);
+        triggerCrawlProcess("create");
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLocation);
     }
 
@@ -45,6 +50,7 @@ public class LocationController {
             @PathVariable("userId") Long userId,
             @RequestBody @Valid LocationUpdateDTO locationUpdateDTO) {
         LocationDTO updatedLocation = locationService.updateLocationByUserId(userId, locationUpdateDTO);
+        triggerCrawlProcess("update");
         return ResponseEntity.ok(updatedLocation);
     }
 
@@ -52,5 +58,18 @@ public class LocationController {
     public ResponseEntity<List<CountryWithCitiesDTO>> getAllCountriesAndCities() {
         List<CountryWithCitiesDTO> result = locationService.getAllCountriesAndCities();
         return ResponseEntity.ok(result);
+    }
+
+    private void triggerCrawlProcess(String action) {
+        try {
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.EXCHANGE_NAME,
+                    "location.update",
+                    action
+            );
+            log.info("Message sent to RabbitMQ: {}", action);
+        } catch (Exception e) {
+            log.error("Failed to send message to RabbitMQ: {}", e.getMessage());
+        }
     }
 }

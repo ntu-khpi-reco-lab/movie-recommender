@@ -12,8 +12,15 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017
+      uri: mongodb://user:pass@localhost:27017
       database: movieDB
 
+  # RabbitMQ configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: com-movie-recommender-user
+    password: com-movie-recommender-password
+
 dataset:
-  path: C:/3course_project/data/movies.json
+  path: D:/University/3_course/1_semestre/Project/movies.json

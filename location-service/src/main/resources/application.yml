@@ -26,6 +26,13 @@ spring:
     default-schema: public
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+  # RabbitMQ configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: com-movie-recommender-user
+    password: com-movie-recommender-password
+
 # Docker-specific configuration
 ---
 spring:
