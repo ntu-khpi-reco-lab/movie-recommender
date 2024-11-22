@@ -1,0 +1,10 @@
+server:
+  port: 9005  # Search Service running on port 9005
+
+spring:
+  application:
+    name: search-service
+  data:
+    mongodb:
+      uri: mongodb://user:pass@localhost:27017
+      database: movieDB
