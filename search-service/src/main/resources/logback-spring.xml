@@ -21,6 +21,6 @@
         <appender-ref ref="FILE" />
     </root>
 
-    <!-- Package-specific logger (DEBUG level for com.movie.recommender.location) -->
-    <logger name="com.movie.recommender.location" level="DEBUG" />
+    <!-- Package-specific logger (DEBUG level for com.movie.recommender.search) -->
+    <logger name="com.movie.recommender.search" level="DEBUG" />
 </configuration>

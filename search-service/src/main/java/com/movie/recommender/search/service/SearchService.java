@@ -2,6 +2,8 @@ package com.movie.recommender.search.service;
 
 import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.search.model.SearchFilter;
+import com.movie.recommender.search.util.GenresUtils;
+import com.movie.recommender.search.util.RatingUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -17,30 +19,6 @@ import java.util.List;
 @Service
 public class SearchService {
     final private MongoTemplate mongoTemplate;
-    final private List<String> DEFAULT_GENRES = List.of(
-            "Action",
-            "Adventure",
-            "Animation",
-            "Comedy",
-            "Crime",
-            "Documentary",
-            "Drama",
-            "Family",
-            "Fantasy",
-            "History",
-            "Horror",
-            "Music",
-            "Mystery",
-            "Romance",
-            "Science Fiction",
-            "TV Movie",
-            "Thriller",
-            "War",
-            "Western"
-
-    );
-    private final double MINIMAL_RATING = 0.0;
-    private final double MAXIMAL_RATING = 10.0;
 
     public SearchService(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
@@ -105,11 +83,11 @@ public class SearchService {
         if (ratingStart > ratingEnd) {
             throw new IllegalArgumentException("ratingStart must be lower than ratingEnd");
         }
-        if (ratingStart < MINIMAL_RATING) {
-            throw new IllegalArgumentException("ratingStart must be greater than " + MINIMAL_RATING);
+        if (ratingStart < RatingUtils.MINIMAL_RATING) {
+            throw new IllegalArgumentException("ratingStart must be greater than " + RatingUtils.MINIMAL_RATING);
         }
-        if (ratingEnd > MAXIMAL_RATING) {
-            throw new IllegalArgumentException("ratingEnd must be lower than " + MAXIMAL_RATING);
+        if (ratingEnd > RatingUtils.MAXIMAL_RATING) {
+            throw new IllegalArgumentException("ratingEnd must be lower than " + RatingUtils.MAXIMAL_RATING);
         }
     }
 
@@ -132,7 +110,7 @@ public class SearchService {
 
     private void validateGenres(List<String> genres) {
         for (String genre : genres) {
-            if (!DEFAULT_GENRES.contains(genre)) {
+            if (!GenresUtils.DEFAULT_GENRES.contains(genre.toLowerCase())) {
                 throw new IllegalArgumentException("Genre " + genre + " is not a valid genre");
             }
         }
