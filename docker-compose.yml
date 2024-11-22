@@ -8,6 +8,7 @@ services:
     depends_on:
       - location-service
       - user-service
+      - search-service
     networks:
       - movie-reco-net
 
@@ -35,6 +36,35 @@ services:
     networks:
       - movie-reco-net
 
+  search-service:
+    build:
+      context: .
+      dockerfile: ./search-service/Dockerfile
+    ports:
+      - "9005:9005"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - movie-reco-net
+
+  crawler:
+    build:
+      context: .
+      dockerfile: ./crawler/Dockerfile
+    environment:
+      SERP_API_KEY: '<key>'
+      TMDB_API_KEY: '<key>'
+    ports:
+      - "9003:9003"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ../data:/data # Path to the data folder. Need to be created before running the docker-compose
+    networks:
+      - movie-reco-net
+
   postgres:
     image: postgres
     restart: always
@@ -57,6 +87,12 @@ services:
 
   mongodb:
     image: mongodb/mongodb-community-server:6.0-ubi8
+    healthcheck:
+      test: [ "CMD","mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     environment:
       - MONGO_INITDB_ROOT_USERNAME=user
       - MONGO_INITDB_ROOT_PASSWORD=pass
@@ -66,6 +102,8 @@ services:
       - type: bind
         source: ../data # Path to the data folder. Need to be created before running the docker-compose
         target: /data/db/v6
+    networks:
+      - movie-reco-net
 
 networks:
   movie-reco-net:
