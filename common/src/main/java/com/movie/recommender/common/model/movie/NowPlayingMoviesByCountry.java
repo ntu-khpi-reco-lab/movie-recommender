@@ -6,7 +6,6 @@ import java.util.List;
 @Data
 public class NowPlayingMoviesByCountry {
     private String countryCode;
-    private DateRange dateRange;
     private List<MovieIdentifier> results;
 
     @Data

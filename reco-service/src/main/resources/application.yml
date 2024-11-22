@@ -9,3 +9,8 @@ service:
 spring:
   application:
     name: reco-service
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+      database: movieDB

@@ -59,6 +59,7 @@ public class MovieService {
         if (nowPlayingMovieOpt.isPresent()) {
             NowPlayingMoviesByCountry nowPlayingMovie = nowPlayingMovieOpt.get();
             nowPlayingMovie.setCountryCode(countryCode);
+            mongoDBService.insertNowPlayingMovies(nowPlayingMovie);
             processNowPlayingMoviesDetails(nowPlayingMovie);
             log.info("Now playing movies for country '{}' inserted into MongoDB.", countryCode);
             return nowPlayingMovie;
