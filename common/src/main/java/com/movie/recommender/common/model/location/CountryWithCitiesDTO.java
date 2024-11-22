@@ -14,4 +14,5 @@ public class CountryWithCitiesDTO {
     @JsonProperty("countryName")
     private String countryName;
     private List<String> cities;
+    private String countryCode;
 }

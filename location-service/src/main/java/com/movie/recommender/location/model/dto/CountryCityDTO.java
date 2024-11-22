@@ -10,4 +10,5 @@ import lombok.Data;
 public class CountryCityDTO {
     private String countryName;
     private String cityName;
+    private String countryCode;
 }

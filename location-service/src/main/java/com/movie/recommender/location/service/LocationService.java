@@ -45,19 +45,20 @@ public class LocationService {
 
         String cityName = result.getCity();
         String countryName = result.getCountry();
+        String countryCode = result.getProv();
 
         log.info("Fetching city: {} and country {} from db", cityName, countryName);
-        Country country = findOrCreateCountryByName(countryName);
+        Country country = findOrCreateCountryByName(countryName, countryCode);
         return findOrCreateCityByName(cityName, country);
     }
 
-    private Country findOrCreateCountryByName(String name) {
+    private Country findOrCreateCountryByName(String name, String countryCode) {
         log.info("Finding country by name: {}", name);
         return countryRepository.findByName(name)
                 .orElseGet(() -> {
                     log.info("Creating new country: {}", name);
-                    Country newCountry = new Country(name);
-                    log.info("New country {} was successfully created", newCountry);
+                    Country newCountry = new Country(name, countryCode);
+                    log.info("New country {} was successfully created", newCountry.getName());
                     return countryRepository.save(newCountry);
                 });
     }
@@ -68,7 +69,7 @@ public class LocationService {
                 .orElseGet(() -> {
                     log.info("Creating new city: {}", name);
                     City newCity = new City(name, country);
-                    log.info("New city {} was successfully created", newCity);
+                    log.info("New city {} was successfully created", newCity.getName());
                     return cityRepository.save(newCity);
                 });
     }
@@ -125,17 +126,22 @@ public class LocationService {
         log.info("Fetching all countries and cities");
 
         List<CountryCityDTO> countriesAndCities = countryRepository.getAllCountriesAndCities();
-        Map<String, List<String>> countriesCitiesMap = new HashMap<>();
+
+        Map<String, Map.Entry<String, List<String>>> countriesMap = new HashMap<>();
 
         for (CountryCityDTO entry : countriesAndCities) {
-            countriesCitiesMap
-                    .computeIfAbsent(entry.getCountryName(), k -> new ArrayList<>())
+            countriesMap
+                    .computeIfAbsent(entry.getCountryName(), k -> Map.entry(entry.getCountryCode(), new ArrayList<>()))
+                    .getValue()
                     .add(entry.getCityName());
         }
 
         List<CountryWithCitiesDTO> result = new ArrayList<>();
-        for (Map.Entry<String, List<String>> entry : countriesCitiesMap.entrySet()) {
-            result.add(new CountryWithCitiesDTO(entry.getKey(), entry.getValue()));
+        for (Map.Entry<String, Map.Entry<String, List<String>>> entry : countriesMap.entrySet()) {
+            String countryName = entry.getKey();
+            String countryCode = entry.getValue().getKey();
+            List<String> cities = entry.getValue().getValue();
+            result.add(new CountryWithCitiesDTO(countryName, cities, countryCode));
         }
 
         return result;
