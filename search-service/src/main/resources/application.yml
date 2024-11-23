@@ -1,22 +1,13 @@
 server:
-  port: 9003  # Crawler runs on port 9003
-
-service:
-  location:
-    service:
-      url: http://localhost:9001
+  port: 9005  # Search Service running on port 9005
 
 spring:
   application:
-    name: crawler
-
+    name: search-service
   data:
     mongodb:
-      uri: mongodb://localhost:27017
+      uri: mongodb://user:pass@localhost:27017
       database: movieDB
-
-dataset:
-  path: /data/movies.json
 
 # Docker-specific configuration
 ---

@@ -18,10 +18,8 @@ public class HttpClient {
     private final ObjectMapper objectMapper;
     private final AuthProvider authProvider;
 
-    public HttpClient(){
-        this.client = new OkHttpClient();
-        this.objectMapper = createObjectMapper();
-        this.authProvider = new NoAuthProvider();
+    public HttpClient() {
+        this(new NoAuthProvider());
     }
 
     public HttpClient(AuthProvider authProvider) {
@@ -30,15 +28,33 @@ public class HttpClient {
         this.authProvider = authProvider;
     }
 
-    public <T> T get(String url, Class<T> tClass) throws IOException {
-        HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
-        Request.Builder requestBuilder = new Request.Builder();
+    public <T> T get(String url, Class<T> tClass) {
+        Request request = buildRequest(url, null, "GET", null);
+        return executeRequest(request, tClass);
+    }
 
-        // Apply authentication based on the provider type
+    public <T> T post(String url, Object body, Class<T> tClass) {
+        String jsonBody = serializeRequestBody(body);
+        Request request = buildRequest(url, null, "POST", jsonBody);
+        return executeRequest(request, tClass);
+    }
+
+    private Request buildRequest(String url, HttpUrl.Builder urlBuilder, String method, String jsonBody) {
+        if (urlBuilder == null) {
+            urlBuilder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
+        }
+
+        Request.Builder requestBuilder = new Request.Builder();
         authProvider.applyAuth(requestBuilder, urlBuilder);
 
-        Request request = requestBuilder.url(urlBuilder.build()).build();
+        Request.Builder finalRequestBuilder = requestBuilder.url(urlBuilder.build());
+        if ("POST".equalsIgnoreCase(method) && jsonBody != null) {
+            finalRequestBuilder.post(okhttp3.RequestBody.create(jsonBody, okhttp3.MediaType.parse("application/json")));
+        }
+        return finalRequestBuilder.build();
+    }
 
+    private <T> T executeRequest(Request request, Class<T> tClass) {
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected response code: " + response.code());
@@ -47,10 +63,19 @@ public class HttpClient {
                 throw new IOException("Response body is null");
             }
             return objectMapper.readValue(response.body().string(), tClass);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to execute request", e);
         }
     }
 
-    // Create and configure ObjectMapper with necessary features
+    private String serializeRequestBody(Object body) {
+        try {
+            return objectMapper.writeValueAsString(body);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed to serialize request body to JSON", e);
+        }
+    }
+
     private ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
