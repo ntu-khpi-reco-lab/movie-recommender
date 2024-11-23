@@ -1,9 +1,9 @@
 package com.movie.recommender.reco.service;
 
+import com.movie.recommender.common.client.FavoritesClient;
+import com.movie.recommender.common.client.LocationClient;
+import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
-import com.movie.recommender.location.model.dto.LocationDTO;
-import com.movie.recommender.reco.client.FavoritesClient;
-import com.movie.recommender.reco.client.LocationClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

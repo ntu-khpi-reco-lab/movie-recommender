@@ -1,4 +1,4 @@
-package com.movie.recommender.reco.client;
+package com.movie.recommender.common.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

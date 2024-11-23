@@ -8,8 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableFeignClients(basePackages = {
-        "com.movie.recommender.reco.client",
-        "com.movie.recommender.crawler.service"
+        "com.movie.recommender.common.client"
 })
 public class RecoServiceApplication {
     public static void main(String[] args) {

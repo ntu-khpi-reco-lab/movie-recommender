@@ -1,6 +1,6 @@
-package com.movie.recommender.reco.client;
+package com.movie.recommender.common.client;
 
-import com.movie.recommender.location.model.dto.LocationDTO;
+import com.movie.recommender.common.model.location.LocationDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
