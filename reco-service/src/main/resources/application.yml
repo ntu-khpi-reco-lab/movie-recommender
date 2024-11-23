@@ -4,7 +4,10 @@ server:
 service:
   location:
     service:
-      url: http://localhost:9006
+      url: http://localhost:9001
+  user:
+    service:
+      url: http://localhost:9002
 
 spring:
   application:

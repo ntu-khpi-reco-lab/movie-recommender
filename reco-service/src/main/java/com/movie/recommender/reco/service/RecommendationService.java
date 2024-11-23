@@ -1,7 +1,7 @@
 package com.movie.recommender.reco.service;
 
 import com.movie.recommender.common.client.FavoritesClient;
-import com.movie.recommender.common.client.LocationClient;
+import com.movie.recommender.common.client.LocationServiceClient;
 import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
 import org.springframework.stereotype.Service;
@@ -14,13 +14,13 @@ import java.util.HashMap;
 @Service
 public class RecommendationService {
 
-    private final LocationClient locationClient;
+    private final LocationServiceClient locationClient;
     private final FavoritesClient favoritesClient;
     private final MongoDBService mongoDBService;
     private final String COUNTRY_CODE = "ua";
 
     public RecommendationService(
-            LocationClient locationClient,
+            LocationServiceClient locationClient,
             FavoritesClient favoritesClient,MongoDBService mongoDBService
     ) {
         this.locationClient = locationClient;
