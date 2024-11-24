@@ -57,14 +57,14 @@ public class RecommendationService {
         predictRequest.setMovieIds(nowPlayingMovieIds);
         log.info("Sending predict request: {}", predictRequest);
 
-        //PredictResponse predictResponse = movieRecoClient.getRecommendations(predictRequest);
-        //log.info("Received predict response: {}", predictResponse);
+        PredictResponse predictResponse = movieRecoClient.getRecommendations(predictRequest);
+        log.info("Received predict response: {}", predictResponse);
 
         Map<String, Object> response = new HashMap<>();
         response.put("userId", userId);
         response.put("location", location);
         response.put("favorites", favoriteMovies);
-        //response.put("recommendations", predictResponse);
+        response.put("recommendations", predictResponse);
 
         return response;
     }

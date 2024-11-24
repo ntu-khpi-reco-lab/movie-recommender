@@ -8,6 +8,8 @@ import com.movie.recommender.lib.http.auth.NoAuthProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 
 @Slf4j
 @Service
@@ -49,6 +51,10 @@ public class MovieRecoClient {
     // Will be deleted in the final version
     private PredictResponse mockResponse(PredictRequest request) {
         PredictResponse response = new PredictResponse();
+        // Ensure the list is initialized
+        if (response.getPredictions() == null) {
+            response.setPredictions(new ArrayList<>());
+        }
         for (Long movieId : request.getMovieIds()) {
             response.getPredictions().add(new Prediction(movieId, Math.random()));
         }
