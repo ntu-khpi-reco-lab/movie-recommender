@@ -4,8 +4,6 @@ import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.location.model.entity.City;
 import com.movie.recommender.location.model.entity.Location;
 
-
-
 public class LocationDTOMapper {
 
     public static LocationDTO toDTO(Location location) {

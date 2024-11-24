@@ -1,5 +1,8 @@
 server:
-  port: 9006  # Crawler runs on port 9004
+  port: 9006  # reco-service runs on port 9006
+
+reco:
+  threshold: 0.25
 
 service:
   location:

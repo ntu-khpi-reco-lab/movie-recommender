@@ -8,6 +8,7 @@ import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
 import com.movie.recommender.common.model.reco.PredictRequest;
 import com.movie.recommender.common.model.reco.PredictResponse;
 import com.movie.recommender.common.model.reco.Prediction;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.util.*;
@@ -22,6 +23,8 @@ public class RecommendationService {
     private final MongoDBService mongoDBService;
     private final MovieRecoClient movieRecoClient;
     private final String COUNTRY_CODE = "ua";
+    @Value("${reco.threshold}")  // Read the threshold value from the configuration file
+    private double scoreThreshold;
 
     public RecommendationService(
             LocationServiceClient locationClient,
@@ -35,8 +38,6 @@ public class RecommendationService {
         this.movieRecoClient = movieRecoClient;
     }
 
-
-
     public List<Prediction> getRecommendations(Long userId) {
         log.info("Starting recommendation process for user ID: {}", userId);
 
@@ -47,7 +48,7 @@ public class RecommendationService {
         PredictRequest predictRequest = createPredictRequest(favoriteMovies, nowPlayingMovieIds);
         PredictResponse predictResponse = fetchPredictions(predictRequest);
 
-        return filterPredictions(predictResponse, 0.25);
+        return filterPredictions(predictResponse, scoreThreshold);
     }
 
     // Fetch user's location
@@ -93,7 +94,7 @@ public class RecommendationService {
     private List<Prediction> filterPredictions(PredictResponse predictResponse, double threshold) {
         log.info("Filtering predictions with threshold: {}", threshold);
         List<Prediction> filteredPredictions = predictResponse.getPredictions().stream()
-                .filter(prediction -> prediction.getScore() > threshold)
+                .filter(prediction -> prediction.getScore() >= threshold)
                 .collect(Collectors.toList());
         log.info("Filtered predictions: {}", filteredPredictions);
         return filteredPredictions;
