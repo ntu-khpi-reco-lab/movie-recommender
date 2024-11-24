@@ -7,6 +7,7 @@ import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
 import com.movie.recommender.common.model.reco.PredictRequest;
 import com.movie.recommender.common.model.reco.PredictResponse;
+import com.movie.recommender.common.model.reco.Prediction;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import java.util.*;
@@ -36,36 +37,65 @@ public class RecommendationService {
 
 
 
-    public Map<String, Object> getRecommendations(Long userId) {
+    public List<Prediction> getRecommendations(Long userId) {
+        log.info("Starting recommendation process for user ID: {}", userId);
+
+        LocationDTO location = fetchUserLocation(userId);
+        Set<Long> favoriteMovies = fetchUserFavoriteMovies(userId);
+        List<Long> nowPlayingMovieIds = fetchNowPlayingMovieIds();
+
+        PredictRequest predictRequest = createPredictRequest(favoriteMovies, nowPlayingMovieIds);
+        PredictResponse predictResponse = fetchPredictions(predictRequest);
+
+        return filterPredictions(predictResponse, 0.25);
+    }
+
+    // Fetch user's location
+    private LocationDTO fetchUserLocation(Long userId) {
         log.info("Fetching location for user ID: {}", userId);
-        LocationDTO location = locationClient.getLocationByUserId(userId);
+        return locationClient.getLocationByUserId(userId);
+    }
 
+    // Fetch user's favorite movies
+    private Set<Long> fetchUserFavoriteMovies(Long userId) {
         log.info("Fetching favorite movies for user ID: {}", userId);
-        Set<Long> favoriteMovies = favoritesClient.getFavoriteMovies(userId);
+        return favoritesClient.getFavoriteMovies(userId);
+    }
 
+    // Fetch IDs of now-playing movies
+    private List<Long> fetchNowPlayingMovieIds() {
         log.info("Fetching now playing movies for country code: {}", COUNTRY_CODE);
         List<NowPlayingMoviesByCountry> nowPlayingMovies = mongoDBService.getNowPlayingMoviesByCountry(COUNTRY_CODE);
-
-        List<Long> nowPlayingMovieIds = nowPlayingMovies.stream()
+        return nowPlayingMovies.stream()
                 .flatMap(country -> country.getResults().stream())
                 .map(NowPlayingMoviesByCountry.MovieIdentifier::getId)
                 .collect(Collectors.toList());
-        log.info("Now playing movie IDs: {}", nowPlayingMovieIds);
+    }
 
+    // Create a PredictRequest object
+    private PredictRequest createPredictRequest(Set<Long> favoriteMovies, List<Long> nowPlayingMovieIds) {
         PredictRequest predictRequest = new PredictRequest();
         predictRequest.setLikedMovieIds(new ArrayList<>(favoriteMovies));
         predictRequest.setMovieIds(nowPlayingMovieIds);
-        log.info("Sending predict request: {}", predictRequest);
+        log.info("Created predict request: {}", predictRequest);
+        return predictRequest;
+    }
 
+    // Fetch predictions from the recommendation service
+    private PredictResponse fetchPredictions(PredictRequest predictRequest) {
+        log.info("Sending predict request: {}", predictRequest);
         PredictResponse predictResponse = movieRecoClient.getRecommendations(predictRequest);
         log.info("Received predict response: {}", predictResponse);
+        return predictResponse;
+    }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("userId", userId);
-        response.put("location", location);
-        response.put("favorites", favoriteMovies);
-        response.put("recommendations", predictResponse);
-
-        return response;
+    // Filter predictions based on the score threshold
+    private List<Prediction> filterPredictions(PredictResponse predictResponse, double threshold) {
+        log.info("Filtering predictions with threshold: {}", threshold);
+        List<Prediction> filteredPredictions = predictResponse.getPredictions().stream()
+                .filter(prediction -> prediction.getScore() > threshold)
+                .collect(Collectors.toList());
+        log.info("Filtered predictions: {}", filteredPredictions);
+        return filteredPredictions;
     }
 }
