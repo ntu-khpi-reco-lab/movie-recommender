@@ -2,15 +2,15 @@ server:
   port: 9006  # reco-service runs on port 9006
 
 reco:
-  threshold: 0.25
+  threshold: 0.25 # Threshold for recommendations to be considered relevant
 
 service:
   location:
     service:
-      url: http://localhost:9001
+      url: http://location-service:9001
   user:
     service:
-      url: http://localhost:9002
+      url: http://user-service:9002
 
 spring:
   application:
@@ -19,4 +19,15 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017
+      database: movieDB
+
+# Docker-specific configuration
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  data:
+    mongodb:
+      uri: mongodb://user:pass@mongodb:27017
       database: movieDB

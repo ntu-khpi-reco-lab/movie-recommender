@@ -15,4 +15,7 @@ public class SearchFilter {
     private List<String> castNames;
     private List<String> crewNames;
     private List<String> keywords;
+
+    private Integer page = 1; // Default page number
+    private Integer size = 10; // Default page size
 }
