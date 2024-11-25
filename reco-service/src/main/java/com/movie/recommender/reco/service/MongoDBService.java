@@ -1,6 +1,7 @@
 package com.movie.recommender.reco.service;
 
 import com.mongodb.MongoException;
+import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -28,5 +29,10 @@ public class MongoDBService {
             log.error("Error fetching now playing movies for country '{}': {}", countryCode, e.getMessage(), e);
             return List.of();
         }
+    }
+
+    public MovieDetails getMovieDetailsById(Long movieId) {
+        Query query = new Query(Criteria.where("id").is(movieId));
+        return mongoTemplate.findOne(query, MovieDetails.class);
     }
 }
