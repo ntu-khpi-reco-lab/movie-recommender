@@ -1,11 +1,12 @@
-package com.movie.recommender.location.model.dto;
+package com.movie.recommender.common.model.location;
 
-import com.movie.recommender.location.model.entity.City;
-import com.movie.recommender.location.model.entity.Location;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
-import lombok.*;
 
 @Data
 @AllArgsConstructor
@@ -26,18 +27,4 @@ public class LocationDTO {
     private String cityName;
     private String countryName;
 
-    public static LocationDTO toDTO(Location location) {
-        City city = location.getCity();
-        String cityName = city.getName();
-        String countryName = city.getCountry().getName();
-        return new LocationDTO(
-                location.getId(),
-                location.getLatitude(),
-                location.getLongitude(),
-                location.getUserId(),
-                location.getCreatedAt(),
-                cityName,
-                countryName
-        );
-    }
 }
