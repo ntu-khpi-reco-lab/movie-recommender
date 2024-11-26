@@ -1,18 +1,20 @@
 package com.movie.recommender.location.service;
 
-import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.location.exception.LocationNotFoundException;
-import com.movie.recommender.location.model.dto.*;
+import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.location.repository.LocationRepository;
+import com.movie.recommender.common.model.location.LocationMessage;
 import com.movie.recommender.location.repository.CountryRepository;
 import com.movie.recommender.location.repository.CityRepository;
 import com.movie.recommender.location.model.entity.Location;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.movie.recommender.location.model.entity.Country;
+import com.movie.recommender.common.config.RabbitMQConfig;
 import com.movie.recommender.location.model.entity.City;
+import com.movie.recommender.location.model.dto.*;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,15 +29,17 @@ public class LocationService {
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
     private final GeolocationService geolocationService;
+    private final RabbitTemplate rabbitTemplate;
 
     public LocationService(LocationRepository locationRepository,
                            CityRepository cityRepository,
                            CountryRepository countryRepository,
-                           GeolocationService geolocationService) {
+                           GeolocationService geolocationService, RabbitTemplate rabbitTemplate) {
         this.locationRepository = locationRepository;
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
         this.geolocationService = geolocationService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     private City getCityByCoordinates(Double latitude, Double longitude) {
@@ -69,7 +73,9 @@ public class LocationService {
                     log.info("Creating new city: {}", name);
                     City newCity = new City(name, country);
                     log.info("New city {} was successfully created", newCity);
-                    return cityRepository.save(newCity);
+                    City savedCity = cityRepository.save(newCity);
+                    sendLocationUpdateMessage(new LocationMessage("create"));
+                    return savedCity;
                 });
     }
 
@@ -139,5 +145,18 @@ public class LocationService {
         }
 
         return result;
+    }
+
+    private void sendLocationUpdateMessage(LocationMessage message) {
+        try {
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.NEW_LOCATION_EXCHANGE ,
+                    RabbitMQConfig.NEW_LOCATION_ROUTINGKEY,
+                    message
+            );
+            log.info("Message sent to RabbitMQ: {}", message.getMessage());
+        } catch (Exception e) {
+            log.error("Failed to send message to RabbitMQ: {}", e.getMessage());
+        }
     }
 }
