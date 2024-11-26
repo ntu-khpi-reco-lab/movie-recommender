@@ -6,10 +6,15 @@ import com.movie.recommender.common.client.MovieRecoClient;
 import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
+import com.movie.recommender.common.model.reco.MovieWithShowtime;
 import com.movie.recommender.common.model.reco.PredictRequest;
 import com.movie.recommender.common.model.reco.PredictResponse;
 import com.movie.recommender.common.model.reco.Prediction;
+import com.movie.recommender.common.model.showtime.Showtime;
+import com.movie.recommender.common.model.showtime.ShowtimesByCity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +45,7 @@ public class RecommendationService {
         this.movieRecoClient = movieRecoClient;
     }
 
-    public List<MovieDetails> getRecommendations(Long userId) {
+    public List<MovieWithShowtime> getRecommendations(Long userId) {
         log.info("Starting recommendation process for user ID: {}", userId);
 
         LocationDTO location = fetchUserLocation(userId);
@@ -54,7 +59,7 @@ public class RecommendationService {
         List<Long> filteredMovieIds = filterPredictions(predictResponse, scoreThreshold);
 
         // Fetch movie details for the filtered predictions
-        return fetchMovieDetails(filteredMovieIds);
+        return fetchMoviesWithShowtimes(filteredMovieIds,location);
     }
 
     private LocationDTO fetchUserLocation(Long userId) {
@@ -99,11 +104,26 @@ public class RecommendationService {
                 .collect(Collectors.toList());
     }
 
-    private List<MovieDetails> fetchMovieDetails(List<Long> movieIds) {
-        log.info("Fetching movie details for filtered movie IDs: {}", movieIds);
-        return movieIds.stream()
-                .map(mongoDBService::getMovieDetailsById)  // Fetch movie details from MongoDB
-                .filter(Objects::nonNull)  // Exclude null values if any movie is not found
-                .collect(Collectors.toList());
+    private List<MovieWithShowtime> fetchMoviesWithShowtimes(List<Long> movieIds, LocationDTO location) {
+        log.info("Fetching movies with showtimes for IDs: {}", movieIds);
+
+        List<MovieWithShowtime> moviesWithShowtimes = new ArrayList<>();
+        for (Long movieId : movieIds) {
+            MovieDetails movieDetails = mongoDBService.getMovieDetailsById(movieId);
+
+            // Fetch showtimes using the user's location
+            List<Showtime> showtimes = mongoDBService.getMovieShowtimesByCity(
+                    COUNTRY_CODE,
+                    location.getCityName(),
+                    movieId
+            );
+
+            if (movieDetails != null) {
+                moviesWithShowtimes.add(new MovieWithShowtime(movieDetails, showtimes));
+            }
+        }
+
+        log.info("Fetched {} movies with showtimes", moviesWithShowtimes.size());
+        return moviesWithShowtimes;
     }
 }
