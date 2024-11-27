@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,27 +41,30 @@ public class MongoDBService {
         return mongoTemplate.findOne(query, MovieDetails.class);
     }
 
-    public List<Showtime> getMovieShowtimesByCity(String countryCode, String cityName, Long movieId) {
-        log.info("Fetching showtimes for countryCode: {}, cityName: {}, movieId: {}", countryCode, cityName, movieId);
+    public Map<Long, List<Showtime>> getMovieShowtimesByCity(String countryCode, String cityName, List<Long> movieIds) {
+        log.info("Fetching showtimes for countryCode: {}, cityName: {}, movieIds: {}", countryCode, cityName, movieIds);
 
+        // Build the query with countryCode and cityName
         Query query = new Query(Criteria.where("countryCode").is(countryCode)
                 .and("cityName").is(cityName));
 
+        // Fetch the matching ShowtimesByCity record
         ShowtimesByCity showtimesByCity = mongoTemplate.findOne(query, ShowtimesByCity.class, "ShowtimesByCity");
 
         if (showtimesByCity != null) {
-            log.info("Found ShowtimesByCity for countryCode: {}, cityName: {}", countryCode, cityName);
+            log.info("ShowtimesByCity record found for countryCode: {}, cityName: {}", countryCode, cityName);
 
-            for (ShowtimesByCity.MovieShowtimes movie : showtimesByCity.getMovies()) {
-                if (movie.getId().equals(movieId)) {
-                    log.info("Showtimes found for movieId: {}", movieId);
-                    return movie.getShowtimes();
-                }
-            }
+            // Create a map of movieId to showtimes
+            return showtimesByCity.getMovies().stream()
+                    .filter(movie -> movieIds.contains(movie.getId())) // Only include requested movie IDs
+                    .collect(Collectors.toMap(
+                            ShowtimesByCity.MovieShowtimes::getId,
+                            ShowtimesByCity.MovieShowtimes::getShowtimes
+                    ));
         }
 
-        log.warn("No showtimes found for countryCode: {}, cityName: {}, movieId: {}", countryCode, cityName, movieId);
-        return Collections.emptyList();
+        log.warn("No showtimes found for countryCode: {}, cityName: {}", countryCode, cityName);
+        return Collections.emptyMap(); // Return an empty map if no showtimes are found
     }
 
 }

@@ -107,23 +107,29 @@ public class RecommendationService {
     private List<MovieWithShowtime> fetchMoviesWithShowtimes(List<Long> movieIds, LocationDTO location) {
         log.info("Fetching movies with showtimes for IDs: {}", movieIds);
 
-        List<MovieWithShowtime> moviesWithShowtimes = new ArrayList<>();
-        for (Long movieId : movieIds) {
-            MovieDetails movieDetails = mongoDBService.getMovieDetailsById(movieId);
+        // Fetch all showtimes for the given movie IDs in the user's city
+        Map<Long, List<Showtime>> showtimesMap = mongoDBService.getMovieShowtimesByCity(
+                COUNTRY_CODE,
+                location.getCityName(),
+                movieIds
+        );
 
-            // Fetch showtimes using the user's location
-            List<Showtime> showtimes = mongoDBService.getMovieShowtimesByCity(
-                    COUNTRY_CODE,
-                    location.getCityName(),
-                    movieId
-            );
+        // Fetch movie details and combine them with showtimes
+        List<MovieWithShowtime> moviesWithShowtimes = movieIds.stream()
+                .map(movieId -> {
+                    MovieDetails movieDetails = mongoDBService.getMovieDetailsById(movieId);
+                    List<Showtime> showtimes = showtimesMap.getOrDefault(movieId, Collections.emptyList());
 
-            if (movieDetails != null) {
-                moviesWithShowtimes.add(new MovieWithShowtime(movieDetails, showtimes));
-            }
-        }
+                    if (movieDetails != null) {
+                        return new MovieWithShowtime(movieDetails, showtimes);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull) // Filter out null values
+                .collect(Collectors.toList());
 
         log.info("Fetched {} movies with showtimes", moviesWithShowtimes.size());
         return moviesWithShowtimes;
     }
+
 }
