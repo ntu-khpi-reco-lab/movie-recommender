@@ -1,9 +1,10 @@
 package com.movie.recommender.common.model.location;
 
 import lombok.Data;
+import java.io.Serializable;
 
 @Data
-public class LocationMessage {
+public class LocationMessage implements Serializable {
     private String message;
     private String countryCode;
     private String cityName;

@@ -1,0 +1,7 @@
+FROM rabbitmq:3-management
+
+COPY config/init.sh /etc/rabbitmq/
+
+RUN chmod +x /etc/rabbitmq/init.sh
+
+CMD ["sh", "-c", "rabbitmq-server & sleep 10 && /etc/rabbitmq/init.sh && tail -f /dev/null"]
