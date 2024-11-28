@@ -75,7 +75,7 @@ public class LocationService {
                     City newCity = new City(name, country);
                     log.info("New city {} was successfully created", newCity);
                     City savedCity = cityRepository.save(newCity);
-                    sendLocationUpdateMessage(new LocationMessage("create"));
+                    sendLocationUpdateMessage(new LocationMessage("TEMPORARY EMPTY", savedCity.getName()));
                     return savedCity;
                 });
     }
@@ -155,7 +155,7 @@ public class LocationService {
                     RabbitMQConfig.NEW_LOCATION_ROUTINGKEY,
                     message
             );
-            log.info("Message sent to RabbitMQ: {}", message.getMessage());
+            log.info("Message sent to RabbitMQ: city {}, code {}", message.getCityName(), message.getCountryCode());
         } catch (Exception e) {
             log.error("Failed to send message to RabbitMQ: {}", e.getMessage());
         }
