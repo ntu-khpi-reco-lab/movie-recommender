@@ -4,8 +4,10 @@ server:
 service:
   location:
     service:
-      url: http://localhost:9001
-
+      url: http://location-service:9001
+  user:
+    service:
+      url: http://user-service:9002
 spring:
   application:
     name: crawler

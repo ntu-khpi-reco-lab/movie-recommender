@@ -30,7 +30,14 @@ public class RouteConfig {
                                 .circuitBreaker(config -> config
                                         .setName("search-service-cb")
                                         .setFallbackUri("forward:/search")))
-                        .uri("http://search-service:9005"))  // Ensure the port matches the Search Service
+                        .uri("http://search-service:9005")) // Ensure the port matches the Search Service
+                .route("reco-service", r -> r
+                        .path("/api/v1/recommend/**")
+                        .filters(f -> f
+                                .circuitBreaker(config -> config
+                                        .setName("reco-service-cb")
+                                        .setFallbackUri("forward:/recommend")))
+                        .uri("http://reco-service:9006")) // Ensure the port matches the Reco Service
                 .build();
     }
 }

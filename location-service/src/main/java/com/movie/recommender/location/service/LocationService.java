@@ -6,6 +6,7 @@ import com.movie.recommender.location.repository.LocationRepository;
 import com.movie.recommender.common.model.location.LocationMessage;
 import com.movie.recommender.location.repository.CountryRepository;
 import com.movie.recommender.location.repository.CityRepository;
+import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.location.model.entity.Location;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.movie.recommender.location.model.entity.Country;
@@ -89,13 +90,13 @@ public class LocationService {
         Location savedLocation = locationRepository.save(location);
 
         log.info("New location with ID {} was saved for user {}", savedLocation.getId(), locationCreateDTO.getUserId());
-        return LocationDTO.toDTO(savedLocation);
+        return LocationDTOMapper.toDTO(savedLocation);
     }
 
     public LocationDTO getLocationById(Long id) {
         log.info("Fetching location by ID: {}", id);
         return locationRepository.findById(id)
-                .map(LocationDTO::toDTO)
+                .map(LocationDTOMapper::toDTO)
                 .orElseThrow(() -> new LocationNotFoundException("Location not found with ID: " + id));
     }
 
@@ -103,7 +104,7 @@ public class LocationService {
         log.info("Fetching location for user ID: {}", userId);
         Location location = findLocationByUserId(userId);
         log.info("Location found for user ID: {}", userId);
-        return LocationDTO.toDTO(location);
+        return LocationDTOMapper.toDTO(location);
     }
 
     @Transactional
@@ -119,7 +120,7 @@ public class LocationService {
 
         Location updatedLocation = locationRepository.save(location);
         log.info("Location with ID {} was updated for user ID {}", updatedLocation.getId(), userId);
-        return LocationDTO.toDTO(updatedLocation);
+        return LocationDTOMapper.toDTO(updatedLocation);
     }
 
     private Location findLocationByUserId(Long userId) {

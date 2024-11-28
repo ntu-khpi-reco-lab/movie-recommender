@@ -5,8 +5,6 @@ import com.movie.recommender.location.model.dto.GeolocationResult;
 import com.movie.recommender.lib.http.HttpClient;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-import java.io.IOException;
-
 
 @Slf4j
 @Service
@@ -19,7 +17,7 @@ public class GeolocationService {
         try {
             String url = String.format(GEOLOCATION_URL, latitude, longitude);
             return httpClient.get(url, GeolocationResult.class);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Error fetching geolocation: {}", e.getMessage(), e);
             throw new GeolocationFetchException("Failed to fetch geolocation data from external API", e);
         }

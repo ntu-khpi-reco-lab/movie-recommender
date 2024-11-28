@@ -65,6 +65,17 @@ services:
     networks:
       - movie-reco-net
 
+  reco-service:
+    build:
+      context: .
+      dockerfile: ./reco-service/Dockerfile
+    environment:
+      MOVIE_RECO_BASE_URL: http://localhost:9007
+    ports:
+      - "9006:9006"
+    networks:
+      - movie-reco-net
+
   postgres:
     image: postgres
     restart: always

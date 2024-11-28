@@ -74,6 +74,11 @@ public class SearchService {
             log.info("Filtering by keywords: {}", filter.getKeywords());
         }
 
+        // Add pagination
+        int page = Math.max(filter.getPage() - 1, 0); // Ensure non-negative page index
+        int size = Math.max(filter.getSize(), 1);     // Ensure size is at least 1
+        query.skip((long) page * size).limit(size);
+
         List<MovieDetails> result = mongoTemplate.find(query, MovieDetails.class);
         log.info("Query executed, found {} movies", result.size());
         return result;
