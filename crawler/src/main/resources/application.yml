@@ -4,16 +4,38 @@ server:
 service:
   location:
     service:
-      url: http://localhost:9001
-
+      url: http://location-service:9001
+  user:
+    service:
+      url: http://user-service:9002
 spring:
   application:
     name: crawler
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017
+      uri: mongodb://user:pass@localhost:27017
       database: movieDB
 
+  # RabbitMQ configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: com-movie-recommender-user
+    password: com-movie-recommender-password
+
+# Docker specific configuration
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  data:
+    mongodb:
+      uri: mongodb://user:pass@localhost:27017
+      database: movieDB
+  rabbitmq:
+    host: rabbitmq
+
 dataset:
-  path: C:/3course_project/data/movies.json
+  path: D:/University/3_course/1_semestre/Project/movies.json

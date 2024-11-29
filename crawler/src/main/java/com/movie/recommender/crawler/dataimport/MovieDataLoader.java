@@ -34,6 +34,7 @@ public class MovieDataLoader {
             for (JsonNode entryNode : rootNode) {
                 MovieDetails movieDetails = parseMovieEntry(entryNode);
                 if (movieDetails != null) {
+                    log.debug("Parsed movie: {}", movieDetails.getTitle());
                     movieDetailsList.add(movieDetails);
                 }
             }

@@ -1,6 +1,8 @@
 package com.movie.recommender.location.controller;
 
+
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
+import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.location.service.LocationService;
 import com.movie.recommender.location.model.dto.*;
 import org.springframework.web.bind.annotation.*;

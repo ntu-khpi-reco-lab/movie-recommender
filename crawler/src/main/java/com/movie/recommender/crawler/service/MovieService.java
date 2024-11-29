@@ -9,6 +9,7 @@ import com.movie.recommender.crawler.client.SerpApiClient;
 import com.movie.recommender.crawler.client.TmdbApiClient;
 import com.movie.recommender.crawler.model.showtime.MovieShowtimesResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,6 +31,7 @@ public class MovieService {
         this.mongoDBService = mongoDBService;
     }
 
+    @Async
     public void processCountryMovies() {
         List<CountryWithCitiesDTO> countries = locationServiceClient.getAllCountriesAndCities();
         for (CountryWithCitiesDTO country : countries) {
@@ -57,6 +59,7 @@ public class MovieService {
         if (nowPlayingMovieOpt.isPresent()) {
             NowPlayingMoviesByCountry nowPlayingMovie = nowPlayingMovieOpt.get();
             nowPlayingMovie.setCountryCode(countryCode);
+            mongoDBService.insertNowPlayingMovies(nowPlayingMovie);
             processNowPlayingMoviesDetails(nowPlayingMovie);
             log.info("Now playing movies for country '{}' inserted into MongoDB.", countryCode);
             return nowPlayingMovie;

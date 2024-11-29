@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,4 +29,9 @@ public class User {
 
     private String firstName;
     private String lastName;
+
+    @ElementCollection
+    @CollectionTable(name = "user_favorite_movies", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "movie_id")
+    private Set<Long> favoriteMovies = new HashSet<>();
 }

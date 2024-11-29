@@ -4,10 +4,14 @@ import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.location.exception.LocationNotFoundException;
 import com.movie.recommender.location.model.dto.*;
 import com.movie.recommender.location.repository.LocationRepository;
+import com.movie.recommender.common.model.location.LocationMessage;
 import com.movie.recommender.location.repository.CountryRepository;
 import com.movie.recommender.location.repository.CityRepository;
+import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.location.model.entity.Location;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.movie.recommender.location.model.entity.Country;
+import com.movie.recommender.common.config.RabbitMQConfig;
 import com.movie.recommender.location.model.entity.City;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -27,15 +31,18 @@ public class LocationService {
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
     private final GeolocationService geolocationService;
+    private final RabbitTemplate rabbitTemplate;
 
     public LocationService(LocationRepository locationRepository,
                            CityRepository cityRepository,
                            CountryRepository countryRepository,
-                           GeolocationService geolocationService) {
+                           GeolocationService geolocationService,
+                           RabbitTemplate rabbitTemplate) {
         this.locationRepository = locationRepository;
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
         this.geolocationService = geolocationService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     private City getCityByCoordinates(Double latitude, Double longitude) {
@@ -45,7 +52,7 @@ public class LocationService {
 
         String cityName = result.getCity();
         String countryName = result.getCountry();
-        String countryCode = result.getProv();
+        String countryCode = result.getCountryCode();
 
         log.info("Fetching city: {} and country {} from db", cityName, countryName);
         Country country = findOrCreateCountryByName(countryName, countryCode);
@@ -69,8 +76,10 @@ public class LocationService {
                 .orElseGet(() -> {
                     log.info("Creating new city: {}", name);
                     City newCity = new City(name, country);
-                    log.info("New city {} was successfully created", newCity.getName());
-                    return cityRepository.save(newCity);
+                    log.info("New city {} was successfully created", newCity);
+                    City savedCity = cityRepository.save(newCity);
+                    sendLocationUpdateMessage(new LocationMessage(country.getCode(), savedCity.getName()));
+                    return savedCity;
                 });
     }
 
@@ -84,13 +93,13 @@ public class LocationService {
         Location savedLocation = locationRepository.save(location);
 
         log.info("New location with ID {} was saved for user {}", savedLocation.getId(), locationCreateDTO.getUserId());
-        return LocationDTO.toDTO(savedLocation);
+        return LocationDTOMapper.toDTO(savedLocation);
     }
 
     public LocationDTO getLocationById(Long id) {
         log.info("Fetching location by ID: {}", id);
         return locationRepository.findById(id)
-                .map(LocationDTO::toDTO)
+                .map(LocationDTOMapper::toDTO)
                 .orElseThrow(() -> new LocationNotFoundException("Location not found with ID: " + id));
     }
 
@@ -98,7 +107,7 @@ public class LocationService {
         log.info("Fetching location for user ID: {}", userId);
         Location location = findLocationByUserId(userId);
         log.info("Location found for user ID: {}", userId);
-        return LocationDTO.toDTO(location);
+        return LocationDTOMapper.toDTO(location);
     }
 
     @Transactional
@@ -114,7 +123,7 @@ public class LocationService {
 
         Location updatedLocation = locationRepository.save(location);
         log.info("Location with ID {} was updated for user ID {}", updatedLocation.getId(), userId);
-        return LocationDTO.toDTO(updatedLocation);
+        return LocationDTOMapper.toDTO(updatedLocation);
     }
 
     private Location findLocationByUserId(Long userId) {
@@ -127,23 +136,29 @@ public class LocationService {
 
         List<CountryCityDTO> countriesAndCities = countryRepository.getAllCountriesAndCities();
 
-        Map<String, Map.Entry<String, List<String>>> countriesMap = new HashMap<>();
+        Map<String, CountryWithCitiesDTO> countriesMap = new HashMap<>();
 
         for (CountryCityDTO entry : countriesAndCities) {
             countriesMap
-                    .computeIfAbsent(entry.getCountryName(), k -> Map.entry(entry.getCountryCode(), new ArrayList<>()))
-                    .getValue()
+                    .computeIfAbsent(entry.getCountryName(), countryName ->
+                            new CountryWithCitiesDTO(countryName, new ArrayList<>(), entry.getCountryCode()))
+                    .getCities()
                     .add(entry.getCityName());
         }
 
-        List<CountryWithCitiesDTO> result = new ArrayList<>();
-        for (Map.Entry<String, Map.Entry<String, List<String>>> entry : countriesMap.entrySet()) {
-            String countryName = entry.getKey();
-            String countryCode = entry.getValue().getKey();
-            List<String> cities = entry.getValue().getValue();
-            result.add(new CountryWithCitiesDTO(countryName, cities, countryCode));
-        }
+        return new ArrayList<>(countriesMap.values());
+    }
 
-        return result;
+    private void sendLocationUpdateMessage(LocationMessage message) {
+        try {
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.NEW_LOCATION_EXCHANGE ,
+                    RabbitMQConfig.NEW_LOCATION_ROUTINGKEY,
+                    message
+            );
+            log.info("Message sent to RabbitMQ: city {}, code {}", message.getCityName(), message.getCountryCode());
+        } catch (Exception e) {
+            log.error("Failed to send message to RabbitMQ: {}", e.getMessage());
+        }
     }
 }

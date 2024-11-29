@@ -14,5 +14,5 @@ public class GeolocationResult{
     private String city;
     private String country;
     @JsonProperty("prov")
-    private String prov;
+    private String countryCode;
 }

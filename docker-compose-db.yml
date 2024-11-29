@@ -31,9 +31,33 @@ services:
         source: ../data # Path to the data folder. Need to be created before running the docker-compose
         target: /data/db/v6
 
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
+    container_name: rabbitmq-movie-recommender
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: com-movie-recommender-user
+      RABBITMQ_DEFAULT_PASS: com-movie-recommender-password
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_logs:/var/log/rabbitmq
+    networks:
+      - movie-reco-net
+
 networks:
   movie-reco-net:
     driver: bridge
 
 volumes:
   mongodb_data_container:
+  rabbitmq_data:
+  rabbitmq_logs:

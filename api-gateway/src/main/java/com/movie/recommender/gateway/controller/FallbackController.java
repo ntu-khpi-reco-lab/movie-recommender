@@ -22,4 +22,14 @@ public class FallbackController {
     public ResponseEntity<String> userServiceFallback() {
         return new ResponseEntity<>("User Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<String> searchServiceFallback() {
+        return new ResponseEntity<>("Search Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @GetMapping("/recommend")
+    public ResponseEntity<String> recoServiceFallback() {
+        return new ResponseEntity<>("Recommendation Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+    }
 }
