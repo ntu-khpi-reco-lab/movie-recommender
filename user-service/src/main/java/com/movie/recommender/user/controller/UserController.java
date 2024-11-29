@@ -2,6 +2,7 @@ package com.movie.recommender.user.controller;
 
 import com.movie.recommender.user.model.dto.*;
 import com.movie.recommender.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,20 +30,23 @@ public class UserController {
         return ResponseEntity.ok(token);
     }
 
-    @GetMapping("/{userId}/profile")
-    public ResponseEntity<UserDTO> getUserProfile(@PathVariable("userId") Long userId) {
+    @GetMapping("/profile")
+        public ResponseEntity<UserDTO> getUserProfile(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
         UserDTO userDTO = userService.getUserProfile(userId);
         return ResponseEntity.ok(userDTO);
     }
 
-    @PutMapping("/{userId}/profile")
-    public ResponseEntity<UserDTO> updateUserProfile(@PathVariable("userId") Long userId, @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+    @PutMapping("/profile")
+    public ResponseEntity<UserDTO> updateUserProfile(HttpServletRequest request, @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+        Long userId = (Long) request.getAttribute("userId");
         UserDTO userDTO = userService.updateUserProfile(userId, userUpdateDTO);
         return ResponseEntity.ok(userDTO);
     }
 
-    @DeleteMapping("/{userId}/profile")
-    public ResponseEntity<Void> deleteUserProfile(@PathVariable("userId") Long userId) {
+    @DeleteMapping("/profile")
+    public ResponseEntity<Void> deleteUserProfile(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
         userService.deleteUserProfile(userId);
         return ResponseEntity.noContent().build();
     }

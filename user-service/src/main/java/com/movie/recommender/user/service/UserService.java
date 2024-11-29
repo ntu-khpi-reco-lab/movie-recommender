@@ -49,7 +49,7 @@ public class UserService {
 
         if (passwordEncoder.matches(password, user.getPassword())) {
             log.info("Login successful for username: {}", username);
-            return jwtUtil.generateToken(username);
+            return jwtUtil.generateToken(username, user.getId());
         } else {
             log.warn("Login failed: Invalid credentials for username {}", username);
             throw new IllegalArgumentException("Invalid credentials");
