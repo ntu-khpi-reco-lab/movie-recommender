@@ -28,6 +28,7 @@ spring:
 
   # RabbitMQ configuration
   rabbitmq:
+    host: localhost
     port: 5672
     username: com-movie-recommender-user
     password: com-movie-recommender-password
@@ -40,3 +41,9 @@ spring:
       on-profile: docker
   datasource:
     url: jdbc:postgresql://postgres:5432/locations
+  data:
+    mongodb:
+      uri: mongodb://user:pass@localhost:27017
+      database: movieDB
+  rabbitmq:
+    host: rabbitmq
