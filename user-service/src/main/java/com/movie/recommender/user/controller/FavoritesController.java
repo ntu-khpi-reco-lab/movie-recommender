@@ -1,9 +1,11 @@
 package com.movie.recommender.user.controller;
 
 import com.movie.recommender.user.model.dto.FavoriteMoviesDTO;
+import com.movie.recommender.user.security.CustomPrincipal;
 import com.movie.recommender.user.service.FavoritesService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -18,27 +20,30 @@ public class FavoritesController {
         this.favoritesService = favoritesService;
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<Set<Long>> getFavoriteMovies(@PathVariable("userId") Long userId) {
-        Set<Long> favoriteMovies = favoritesService.getFavoriteMovies(userId);
+    @GetMapping
+    public ResponseEntity<Set<Long>> getFavoriteMovies(@AuthenticationPrincipal CustomPrincipal principal) {
+        Set<Long> favoriteMovies = favoritesService.getFavoriteMovies(principal.getUserId());
         return ResponseEntity.ok(favoriteMovies);
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<Void> addFavoriteMovies(@PathVariable("userId") Long userId, @RequestBody FavoriteMoviesDTO favoriteMoviesDTO) {
-        favoritesService.addFavoriteMovies(userId, favoriteMoviesDTO.getMovieIds());
+    @PostMapping
+    public ResponseEntity<Void> addFavoriteMovies(@AuthenticationPrincipal CustomPrincipal principal,
+                                                  @RequestBody FavoriteMoviesDTO favoriteMoviesDTO) {
+        favoritesService.addFavoriteMovies(principal.getUserId(), favoriteMoviesDTO.getMovieIds());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> removeFavoriteMovies(@PathVariable("userId") Long userId, @RequestBody FavoriteMoviesDTO favoriteMoviesDTO) {
-        favoritesService.removeFavoriteMovies(userId, favoriteMoviesDTO.getMovieIds());
+    @DeleteMapping
+    public ResponseEntity<Void> removeFavoriteMovies(@AuthenticationPrincipal CustomPrincipal principal,
+                                                     @RequestBody FavoriteMoviesDTO favoriteMoviesDTO) {
+        favoritesService.removeFavoriteMovies(principal.getUserId(), favoriteMoviesDTO.getMovieIds());
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{userId}/{movieId}")
-    public ResponseEntity<Void> removeFavoriteMovie(@PathVariable("userId") Long userId, @PathVariable("movieId") Long movieId) {
-        favoritesService.removeFavoriteMovie(userId, movieId);
+    @DeleteMapping("/{movieId}")
+    public ResponseEntity<Void> removeFavoriteMovie(@AuthenticationPrincipal CustomPrincipal principal,
+                                                    @PathVariable("movieId") Long movieId) {
+        favoritesService.removeFavoriteMovie(principal.getUserId(), movieId);
         return ResponseEntity.noContent().build();
     }
 }

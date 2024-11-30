@@ -20,9 +20,10 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private Long expirationTime;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Long userId) {
         return Jwts.builder()
                 .setSubject(username)
+                .claim("userId", userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -34,9 +35,13 @@ public class JwtUtil {
         return claims != null ? claims.getSubject() : null;
     }
 
-    public boolean isTokenValid(String token, String username) {
-        String extractedUsername = extractUsername(token);
-        return (extractedUsername != null && extractedUsername.equals(username)) && !isTokenExpired(token);
+    public Long extractUserId(String token) {
+        Claims claims = getClaims(token);
+        return claims != null ? claims.get("userId", Long.class) : null;
+    }
+
+    public boolean isTokenValid(String token) {
+        return !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
