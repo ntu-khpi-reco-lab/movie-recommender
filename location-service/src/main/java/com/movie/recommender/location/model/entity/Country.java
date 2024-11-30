@@ -21,10 +21,14 @@ public class Country {
     @NotNull
     private String name;
 
+    @NotNull
+    private String code;
+
     @OneToMany(mappedBy = "country")
     private List<City> cities;
 
-    public Country(String name) {
+    public Country(String name, String code) {
         this.name = name;
+        this.code = code;
     }
 }

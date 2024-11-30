@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-field-countryCode-to-countries
+      author: MykytaKa
+      changes:
+        - sqlFile:
+            path: ../migrations/V3__Add_countryCode_to_countries.sql
+            relativeToChangelogFile: true

@@ -1,7 +1,8 @@
 package com.movie.recommender.location.service;
 
-import com.movie.recommender.location.exception.LocationNotFoundException;
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
+import com.movie.recommender.location.exception.LocationNotFoundException;
+import com.movie.recommender.location.model.dto.*;
 import com.movie.recommender.location.repository.LocationRepository;
 import com.movie.recommender.common.model.location.LocationMessage;
 import com.movie.recommender.location.repository.CountryRepository;
@@ -12,10 +13,10 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.movie.recommender.location.model.entity.Country;
 import com.movie.recommender.common.config.RabbitMQConfig;
 import com.movie.recommender.location.model.entity.City;
-import com.movie.recommender.location.model.dto.*;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,8 @@ public class LocationService {
     public LocationService(LocationRepository locationRepository,
                            CityRepository cityRepository,
                            CountryRepository countryRepository,
-                           GeolocationService geolocationService, RabbitTemplate rabbitTemplate) {
+                           GeolocationService geolocationService,
+                           RabbitTemplate rabbitTemplate) {
         this.locationRepository = locationRepository;
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
@@ -50,19 +52,20 @@ public class LocationService {
 
         String cityName = result.getCity();
         String countryName = result.getCountry();
+        String countryCode = result.getCountryCode();
 
         log.info("Fetching city: {} and country {} from db", cityName, countryName);
-        Country country = findOrCreateCountryByName(countryName);
+        Country country = findOrCreateCountryByName(countryName, countryCode);
         return findOrCreateCityByName(cityName, country);
     }
 
-    private Country findOrCreateCountryByName(String name) {
+    private Country findOrCreateCountryByName(String name, String countryCode) {
         log.info("Finding country by name: {}", name);
         return countryRepository.findByName(name)
                 .orElseGet(() -> {
                     log.info("Creating new country: {}", name);
-                    Country newCountry = new Country(name);
-                    log.info("New country {} was successfully created", newCountry);
+                    Country newCountry = new Country(name, countryCode);
+                    log.info("New country {} was successfully created", newCountry.getName());
                     return countryRepository.save(newCountry);
                 });
     }
@@ -75,7 +78,7 @@ public class LocationService {
                     City newCity = new City(name, country);
                     log.info("New city {} was successfully created", newCity);
                     City savedCity = cityRepository.save(newCity);
-                    sendLocationUpdateMessage(new LocationMessage("TEMPORARY EMPTY", savedCity.getName()));
+                    sendLocationUpdateMessage(new LocationMessage(country.getCode(), savedCity.getName()));
                     return savedCity;
                 });
     }
@@ -132,20 +135,18 @@ public class LocationService {
         log.info("Fetching all countries and cities");
 
         List<CountryCityDTO> countriesAndCities = countryRepository.getAllCountriesAndCities();
-        Map<String, List<String>> countriesCitiesMap = new HashMap<>();
+
+        Map<String, CountryWithCitiesDTO> countriesMap = new HashMap<>();
 
         for (CountryCityDTO entry : countriesAndCities) {
-            countriesCitiesMap
-                    .computeIfAbsent(entry.getCountryName(), k -> new ArrayList<>())
+            countriesMap
+                    .computeIfAbsent(entry.getCountryName(), countryName ->
+                            new CountryWithCitiesDTO(countryName, new ArrayList<>(), entry.getCountryCode()))
+                    .getCities()
                     .add(entry.getCityName());
         }
 
-        List<CountryWithCitiesDTO> result = new ArrayList<>();
-        for (Map.Entry<String, List<String>> entry : countriesCitiesMap.entrySet()) {
-            result.add(new CountryWithCitiesDTO(entry.getKey(), entry.getValue()));
-        }
-
-        return result;
+        return new ArrayList<>(countriesMap.values());
     }
 
     private void sendLocationUpdateMessage(LocationMessage message) {
