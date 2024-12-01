@@ -53,8 +53,8 @@ services:
       context: .
       dockerfile: ./crawler/Dockerfile
     environment:
-      SERP_API_KEY: '<key>'
-      TMDB_API_KEY: '<key>'
+      SERP_API_KEY: '9dc14c3ae6901ba9fbc7e0257594425557b53a2399fda39f89ec67c074df9a56'
+      TMDB_API_KEY: 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3ODg1YzczNjY0ZjNmOWQzZTJlNmE0MTk2Mzk4OThhYiIsIm5iZiI6MTczMTI0NTE2OS4zMjc1MzY4LCJzdWIiOiI2NzAyZjhmOWM5YTEwZDQ2ZWE3ZDY1MjQiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.ZZFm-ZIzekTr6eAvYtKb1kMPtbaIYFLModGsY7PDsFg'
       SPRING_AMQP_DESERIALIZATION_TRUST_ALL: "True"
     ports:
       - "9003:9003"
@@ -145,3 +145,5 @@ networks:
 
 volumes:
   mongodb_data_container:
+  rabbitmq_data:
+  rabbitmq_logs:
