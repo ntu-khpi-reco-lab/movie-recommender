@@ -4,10 +4,10 @@ server:
 service:
   location:
     service:
-      url: http://location-service:9001
+      url: http://localhost:9001
   user:
     service:
-      url: http://user-service:9002
+      url: http://localhost:9002
 spring:
   application:
     name: crawler
@@ -30,12 +30,19 @@ dataset:
 # Docker specific configuration
 ---
 spring:
-  config:
-    activate:
-      on-profile: docker
-  data:
-    mongodb:
-      uri: mongodb://user:pass@mongodb:27017
-      database: movieDB
-  rabbitmq:
-    host: rabbitmq
+  location:
+    service:
+      url: http://location-service:9001
+  user:
+    service:
+      url: http://user-service:9002
+##
+##  config:
+##    activate:
+##      on-profile: docker
+#  data:
+#    mongodb:
+#      uri: mongodb://user:pass@mongodb:27017
+#      database: movieDB
+#  rabbitmq:
+#    host: rabbitmq
