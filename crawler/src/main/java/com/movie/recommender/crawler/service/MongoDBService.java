@@ -98,4 +98,17 @@ public class MongoDBService {
             log.error("Error inserting showtimes for city '{}' in country '{}': {}", showtimesByCity.getCityName(), showtimesByCity.getCountryCode(), e.getMessage(), e);
         }
     }
+
+    public ShowtimesByCity getShowtimesByCity(String countryCode, String cityName) {
+        try {
+            Query query = new Query(
+                    Criteria.where("countryCode").is(countryCode)
+                            .and("cityName").is(cityName)
+            );
+            return mongoTemplate.findOne(query, ShowtimesByCity.class, SHOWTIMES_COLLECTION);
+        } catch (MongoException e) {
+            log.error("Error fetching showtimes for city '{}' in country '{}': {}", cityName, countryCode, e.getMessage(), e);
+            return null;
+        }
+    }
 }

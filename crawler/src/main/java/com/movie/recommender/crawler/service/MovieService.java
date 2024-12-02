@@ -2,6 +2,7 @@ package com.movie.recommender.crawler.service;
 
 import com.movie.recommender.common.client.LocationServiceClient;
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
+import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
 import com.movie.recommender.common.model.showtime.ShowtimesByCity;
@@ -21,7 +22,6 @@ public class MovieService {
     private final TmdbApiClient tmdbApiClient;
     private final SerpApiClient serpApiClient;
     private final MongoDBService mongoDBService;
-    private final Map<String, String> countryCodeMapping = Map.of("Ukraine", "ua");
     private static final int API_CALL_LIMIT = 3;
 
     public MovieService(LocationServiceClient locationServiceClient, MongoDBService mongoDBService) {
@@ -35,15 +35,14 @@ public class MovieService {
     public void processCountryMovies() {
         List<CountryWithCitiesDTO> countries = locationServiceClient.getAllCountriesAndCities();
         for (CountryWithCitiesDTO country : countries) {
-            String countryName = country.getCountryName();
-            String countryCode = countryCodeMapping.get(countryName);
+            String countryCode = country.getCountryCode();
 
             if (countryCode == null) {
-                log.warn("Country code not found for country '{}'. Skipping...", countryName);
+                log.warn("Country code not found for country '{}'. Skipping...", country.getCountryName());
                 continue;
             }
 
-            log.info("Processing country '{}'", countryName);
+            log.info("Processing country '{}'", country.getCountryName());
 
             NowPlayingMoviesByCountry movies = fetchNowPlayingMoviesForCountry(countryCode);
             if (movies != null) {
@@ -164,5 +163,34 @@ public class MovieService {
         }
 
         return null;
+    }
+
+    public ShowtimesByCity getShowtimesForUser(Long userId) {
+        try {
+            // Fetch the location of the user
+            LocationDTO locationDTO = locationServiceClient.getLocationByUserId(userId);
+
+            if (locationDTO == null || locationDTO.getCityName() == null || locationDTO.getCountryName() == null) {
+                throw new IllegalArgumentException("Invalid location data received for user: " + userId);
+            }
+
+            // Fetch the list of countries and their cities
+            List<CountryWithCitiesDTO> countries = locationServiceClient.getAllCountriesAndCities();
+
+            // Find the matching countryCode
+            String countryCode = countries.stream()
+                    .filter(country -> country.getCountryName().equalsIgnoreCase(locationDTO.getCountryName()) &&
+                            country.getCities().stream().anyMatch(city -> city.equalsIgnoreCase(locationDTO.getCityName())))
+                    .map(CountryWithCitiesDTO::getCountryCode)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Country or city not found for user: " + userId));
+
+            // Retrieve showtimes for the user's location
+            return mongoDBService.getShowtimesByCity(countryCode, locationDTO.getCityName());
+
+        } catch (Exception e) {
+            log.error("Error fetching showtimes for user with ID {}: {}", userId, e.getMessage(), e);
+            return null;
+        }
     }
 }
