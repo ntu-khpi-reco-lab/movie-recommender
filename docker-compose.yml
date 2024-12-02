@@ -21,6 +21,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - movie-reco-net
 
@@ -60,6 +62,8 @@ services:
       - "9003:9003"
     depends_on:
       mongodb:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     volumes:
       - ../data:/data # Path to the data folder. Need to be created before running the docker-compose
@@ -145,3 +149,5 @@ networks:
 
 volumes:
   mongodb_data_container:
+  rabbitmq_data:
+  rabbitmq_logs:
