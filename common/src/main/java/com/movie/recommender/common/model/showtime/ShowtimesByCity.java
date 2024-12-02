@@ -6,6 +6,7 @@ import java.util.List;
 @Data
 public class ShowtimesByCity {
     private String countryCode;
+    private String countryName;
     private String cityName;
     private List<MovieShowtimes> movies;
 

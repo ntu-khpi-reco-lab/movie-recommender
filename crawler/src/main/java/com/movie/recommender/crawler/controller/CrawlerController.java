@@ -28,22 +28,14 @@ public class CrawlerController {
         }
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<ShowtimesByCity> getShowtimesByUserId(@PathVariable("userId") Long userId) {
-        try {
-            ShowtimesByCity showtimes = movieService.getShowtimesForUser(userId);
+    @GetMapping("/showtimes")
+    public ResponseEntity<ShowtimesByCity> getShowtimesByLocation(
+            @RequestParam("country") String country,
+            @RequestParam("city") String city) {
 
-            if (showtimes == null) {
-                return ResponseEntity.status(404).body(null);
-            }
+            ShowtimesByCity showtimes = movieService.getShowtimesByCity(country, city);
 
             return ResponseEntity.ok(showtimes);
-        } catch (IllegalArgumentException e) {
-            log.warn("Validation error for user ID {}: {}", userId, e.getMessage());
-            return ResponseEntity.badRequest().body(null);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching showtimes for user ID {}: {}", userId, e.getMessage(), e);
-            return ResponseEntity.status(500).body(null);
-        }
     }
+
 }

@@ -2,7 +2,6 @@ package com.movie.recommender.crawler.service;
 
 import com.movie.recommender.common.client.LocationServiceClient;
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
-import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
 import com.movie.recommender.common.model.showtime.ShowtimesByCity;
@@ -44,20 +43,21 @@ public class MovieService {
 
             log.info("Processing country '{}'", country.getCountryName());
 
-            NowPlayingMoviesByCountry movies = fetchNowPlayingMoviesForCountry(countryCode);
+            NowPlayingMoviesByCountry movies = fetchNowPlayingMoviesForCountry(countryCode,country.getCountryName());
             if (movies != null) {
                 processCountryShowtimes(country, countryCode, movies);
             }
         }
     }
 
-    private NowPlayingMoviesByCountry fetchNowPlayingMoviesForCountry(String countryCode) {
+    private NowPlayingMoviesByCountry fetchNowPlayingMoviesForCountry(String countryCode,String countryName) {
         log.info("Loading now playing movies for country '{}'", countryCode);
 
         Optional<NowPlayingMoviesByCountry> nowPlayingMovieOpt = tmdbApiClient.getNowPlayingMovies(countryCode);
         if (nowPlayingMovieOpt.isPresent()) {
             NowPlayingMoviesByCountry nowPlayingMovie = nowPlayingMovieOpt.get();
             nowPlayingMovie.setCountryCode(countryCode);
+            nowPlayingMovie.setCountryName(countryName);
             mongoDBService.insertNowPlayingMovies(nowPlayingMovie);
             processNowPlayingMoviesDetails(nowPlayingMovie);
             log.info("Now playing movies for country '{}' inserted into MongoDB.", countryCode);
@@ -111,7 +111,8 @@ public class MovieService {
 
         for (String cityName : country.getCities()) {
             ShowtimesByCity showtimesByCity = new ShowtimesByCity();
-            showtimesByCity.setCountryCode(countryCode);
+            showtimesByCity.setCountryCode(country.getCountryCode());
+            showtimesByCity.setCountryName(country.getCountryName());
             showtimesByCity.setCityName(cityName);
 
             List<ShowtimesByCity.MovieShowtimes> movieList = processMovies(
@@ -165,32 +166,14 @@ public class MovieService {
         return null;
     }
 
-    public ShowtimesByCity getShowtimesForUser(Long userId) {
+    public ShowtimesByCity getShowtimesByCity(String countryName, String cityName) {
         try {
-            // Fetch the location of the user
-            LocationDTO locationDTO = locationServiceClient.getLocationByUserId(userId);
-
-            if (locationDTO == null || locationDTO.getCityName() == null || locationDTO.getCountryName() == null) {
-                throw new IllegalArgumentException("Invalid location data received for user: " + userId);
-            }
-
-            // Fetch the list of countries and their cities
-            List<CountryWithCitiesDTO> countries = locationServiceClient.getAllCountriesAndCities();
-
-            // Find the matching countryCode
-            String countryCode = countries.stream()
-                    .filter(country -> country.getCountryName().equalsIgnoreCase(locationDTO.getCountryName()) &&
-                            country.getCities().stream().anyMatch(city -> city.equalsIgnoreCase(locationDTO.getCityName())))
-                    .map(CountryWithCitiesDTO::getCountryCode)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Country or city not found for user: " + userId));
-
-            // Retrieve showtimes for the user's location
-            return mongoDBService.getShowtimesByCity(countryCode, locationDTO.getCityName());
-
-        } catch (Exception e) {
-            log.error("Error fetching showtimes for user with ID {}: {}", userId, e.getMessage(), e);
-            return null;
+            return mongoDBService.getShowtimesByCity(countryName, cityName);
+        }
+        catch (Exception e) {
+            log.error("Error fetching showtimes for location [country: {}, city: {}]: {}", countryName, cityName, e.getMessage(), e);
+            throw e;
         }
     }
+
 }

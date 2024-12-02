@@ -99,16 +99,19 @@ public class MongoDBService {
         }
     }
 
-    public ShowtimesByCity getShowtimesByCity(String countryCode, String cityName) {
+    public ShowtimesByCity getShowtimesByCity(String countryName, String cityName) {
         try {
             Query query = new Query(
-                    Criteria.where("countryCode").is(countryCode)
+                    Criteria.where("countryName").is(countryName)
                             .and("cityName").is(cityName)
             );
             return mongoTemplate.findOne(query, ShowtimesByCity.class, SHOWTIMES_COLLECTION);
         } catch (MongoException e) {
-            log.error("Error fetching showtimes for city '{}' in country '{}': {}", cityName, countryCode, e.getMessage(), e);
+            log.error("Error fetching showtimes for city '{}' in country '{}': {}", cityName, countryName, e.getMessage(), e);
             return null;
         }
     }
+
+
+
 }

@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class NowPlayingMoviesByCountry {
     private String countryCode;
+    private String countryName;
     @JsonProperty("dates")
     private DateRange dateRange;
     private List<MovieIdentifier> results;
