@@ -14,7 +14,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://user:pass@localhost:27017
+      uri: mongodb://localhost:27017
       database: movieDB
 
   # RabbitMQ configuration
@@ -25,7 +25,7 @@ spring:
     password: com-movie-recommender-password
 
 dataset:
-  path: /data/movies.json
+  path: C:\3course_project\data\movies.json
 
 # Docker specific configuration
 ---
@@ -35,7 +35,7 @@ spring:
       on-profile: docker
   data:
     mongodb:
-      uri: mongodb://user:pass@localhost:27017
+      uri: mongodb://user:pass@mongodb:27017
       database: movieDB
   rabbitmq:
     host: rabbitmq
