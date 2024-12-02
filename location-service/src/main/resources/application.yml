@@ -1,10 +1,10 @@
 server:
   port: 9001  # Location Service running on port 9001
 
+# JWT configuration
 jwt:
   secret: SecretKey12345
   expiration: 86400000
-
 
 spring:
   application:

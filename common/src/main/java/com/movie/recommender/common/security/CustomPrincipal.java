@@ -1,4 +1,4 @@
-package com.movie.recommender.user.security;
+package com.movie.recommender.common.security;
 
 
 import lombok.AllArgsConstructor;
