@@ -4,17 +4,17 @@ server:
 service:
   location:
     service:
-      url: http://localhost:9001
+      url: http://location-service:9001
   user:
     service:
-      url: http://localhost:9002
+      url: http://user-service:9002
 spring:
   application:
     name: crawler
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017
+      uri: mongodb://user:pass@localhost:27017
       database: movieDB
 
   # RabbitMQ configuration
@@ -25,18 +25,11 @@ spring:
     password: com-movie-recommender-password
 
 dataset:
-  path: C:\3course_project\data\movies.json
+  path: /data/movies.json
 
 # Docker specific configuration
 ---
 spring:
-  location:
-    service:
-      url: http://location-service:9001
-  user:
-    service:
-      url: http://user-service:9002
-
   config:
     activate:
       on-profile: docker
