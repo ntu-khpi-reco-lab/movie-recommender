@@ -75,7 +75,7 @@ public class LocationService {
                 .orElseGet(() -> {
                     log.info("Creating new city: {}", name);
                     City newCity = new City(name, country);
-                    log.info("New city {} was successfully created", newCity);
+                    log.info("New city {} was successfully created", newCity.getName());
                     City savedCity = cityRepository.save(newCity);
                     sendLocationUpdateMessage(new LocationMessage(country.getCode(), savedCity.getName()));
                     return savedCity;
