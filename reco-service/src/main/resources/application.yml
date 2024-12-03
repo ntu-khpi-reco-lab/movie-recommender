@@ -4,6 +4,11 @@ server:
 reco:
   threshold: 0.25 # Threshold for recommendations to be considered relevant
 
+# JWT configuration
+jwt:
+  secret: SecretKey12345
+  expiration: 86400000
+
 service:
   location:
     service:

@@ -6,6 +6,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication(
         scanBasePackages = {
+                "com.movie.recommender.common.security",
+                "com.movie.recommender.common.config",
                 "com.movie.recommender.common.client",
                 "com.movie.recommender.reco"
         }
