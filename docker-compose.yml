@@ -58,6 +58,7 @@ services:
       SERP_API_KEY: '<key>'
       TMDB_API_KEY: '<key>'
       SPRING_AMQP_DESERIALIZATION_TRUST_ALL: "True"
+      MOVIE_RECO_BASE_URL: http://localhost:9007
     ports:
       - "9003:9003"
     depends_on:
