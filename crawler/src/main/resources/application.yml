@@ -1,6 +1,11 @@
 server:
   port: 9003  # Crawler runs on port 9003
 
+# JWT configuration
+jwt:
+  secret: SecretKey12345
+  expiration: 86400000
+
 service:
   location:
     service:

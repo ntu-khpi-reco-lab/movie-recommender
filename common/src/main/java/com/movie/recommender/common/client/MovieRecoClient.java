@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-
 @Slf4j
 @Service
 public class MovieRecoClient {
