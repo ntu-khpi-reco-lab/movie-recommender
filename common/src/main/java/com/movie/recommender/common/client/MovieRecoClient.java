@@ -23,7 +23,7 @@ public class MovieRecoClient {
         String url = baseUrl + "/recommend";
         log.info("Sending POST request to {}", url);
 
-         PredictResponse predictResponse = httpClient.post(url, request, PredictResponse.class);
+        PredictResponse predictResponse = httpClient.post(url, request, PredictResponse.class);
 
         log.info("Received response from MovieReco service: {}", predictResponse);
         return predictResponse;
