@@ -1,10 +1,11 @@
 package com.movie.recommender.location.controller;
 
-
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.common.model.location.LocationDTO;
+import com.movie.recommender.common.security.CustomPrincipal;
 import com.movie.recommender.location.service.LocationService;
 import com.movie.recommender.location.model.dto.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -12,12 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.Valid;
 import java.util.List;
 
-
 @Slf4j
 @RestController
 @RequestMapping("api/v1/locations")
 public class LocationController {
-
     private final LocationService locationService;
 
     public LocationController(LocationService locationService) {
@@ -25,8 +24,10 @@ public class LocationController {
     }
 
     @PostMapping
-    public ResponseEntity<LocationDTO> createLocation(@RequestBody @Valid LocationCreateDTO locationCreateDTO) {
-        LocationDTO savedLocation = locationService.saveLocation(locationCreateDTO);
+    public ResponseEntity<LocationDTO> createLocation(
+            @AuthenticationPrincipal CustomPrincipal principal,
+            @RequestBody @Valid LocationCreateDTO locationCreateDTO) {
+        LocationDTO savedLocation = locationService.saveLocation(principal.getUserId(), locationCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLocation);
     }
 
@@ -36,17 +37,17 @@ public class LocationController {
         return ResponseEntity.ok(location);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<LocationDTO> getLocationByUserId(@PathVariable("userId") Long userId) {
-        LocationDTO location = locationService.getLocationByUserId(userId);
+    @GetMapping("/users/")
+    public ResponseEntity<LocationDTO> getLocationByUserId(@AuthenticationPrincipal CustomPrincipal principal) {
+        LocationDTO location = locationService.getLocationByUserId(principal.getUserId());
         return ResponseEntity.ok(location);
     }
 
-    @PutMapping("/users/{userId}")
+    @PutMapping("/users/")
     public ResponseEntity<LocationDTO> updateLocationForUser(
-            @PathVariable("userId") Long userId,
+            @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid LocationUpdateDTO locationUpdateDTO) {
-        LocationDTO updatedLocation = locationService.updateLocationByUserId(userId, locationUpdateDTO);
+        LocationDTO updatedLocation = locationService.updateLocationByUserId(principal.getUserId(), locationUpdateDTO);
         return ResponseEntity.ok(updatedLocation);
     }
 

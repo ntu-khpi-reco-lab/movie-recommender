@@ -1,7 +1,7 @@
 package com.movie.recommender.user.controller;
 
 import com.movie.recommender.user.model.dto.FavoriteMoviesDTO;
-import com.movie.recommender.user.security.CustomPrincipal;
+import com.movie.recommender.common.security.CustomPrincipal;
 import com.movie.recommender.user.service.FavoritesService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

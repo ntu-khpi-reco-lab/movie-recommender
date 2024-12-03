@@ -36,13 +36,13 @@ spring:
   user:
     service:
       url: http://user-service:9002
-##
-##  config:
-##    activate:
-##      on-profile: docker
-#  data:
-#    mongodb:
-#      uri: mongodb://user:pass@mongodb:27017
-#      database: movieDB
-#  rabbitmq:
-#    host: rabbitmq
+
+  config:
+    activate:
+      on-profile: docker
+  data:
+    mongodb:
+      uri: mongodb://user:pass@mongodb:27017
+      database: movieDB
+  rabbitmq:
+    host: rabbitmq

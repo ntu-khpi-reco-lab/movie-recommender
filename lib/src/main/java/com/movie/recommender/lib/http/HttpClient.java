@@ -63,7 +63,7 @@ public class HttpClient {
                 throw new IOException("Response body is null");
             }
             return objectMapper.readValue(response.body().string(), tClass);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to execute request", e);
         }
     }

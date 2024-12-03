@@ -11,12 +11,9 @@ import com.movie.recommender.common.model.reco.PredictRequest;
 import com.movie.recommender.common.model.reco.PredictResponse;
 import com.movie.recommender.common.model.reco.Prediction;
 import com.movie.recommender.common.model.showtime.Showtime;
-import com.movie.recommender.common.model.showtime.ShowtimesByCity;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,11 +42,11 @@ public class RecommendationService {
         this.movieRecoClient = movieRecoClient;
     }
 
-    public List<MovieWithShowtime> getRecommendations(Long userId) {
-        log.info("Starting recommendation process for user ID: {}", userId);
+    public List<MovieWithShowtime> getRecommendations(String token) {
+        log.info("Starting recommendation process for user");
 
-        LocationDTO location = fetchUserLocation(userId);
-        Set<Long> favoriteMovies = fetchUserFavoriteMovies(userId);
+        LocationDTO location = fetchUserLocation(token);
+        Set<Long> favoriteMovies = fetchUserFavoriteMovies(token);
         List<Long> nowPlayingMovieIds = fetchNowPlayingMovieIds();
 
         PredictRequest predictRequest = createPredictRequest(favoriteMovies, nowPlayingMovieIds);
@@ -62,14 +59,14 @@ public class RecommendationService {
         return fetchMoviesWithShowtimes(filteredMovieIds,location);
     }
 
-    private LocationDTO fetchUserLocation(Long userId) {
-        log.info("Fetching location for user ID: {}", userId);
-        return locationClient.getLocationByUserId(userId);
+    private LocationDTO fetchUserLocation(String token) {
+        log.info("Fetching location for user ID");
+        return locationClient.getLocationByUserId(token);
     }
 
-    private Set<Long> fetchUserFavoriteMovies(Long userId) {
-        log.info("Fetching favorite movies for user ID: {}", userId);
-        return favoritesClient.getFavoriteMovies(userId);
+    private Set<Long> fetchUserFavoriteMovies(String token) {
+        log.info("Fetching favorite movies for user");
+        return favoritesClient.getFavoriteMovies(token);
     }
 
     private List<Long> fetchNowPlayingMovieIds() {
@@ -131,5 +128,4 @@ public class RecommendationService {
         log.info("Fetched {} movies with showtimes", moviesWithShowtimes.size());
         return moviesWithShowtimes;
     }
-
 }
