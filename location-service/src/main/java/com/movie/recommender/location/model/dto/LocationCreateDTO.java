@@ -24,8 +24,7 @@ public class LocationCreateDTO {
     public static Location toEntity(LocationCreateDTO locationCreateDTO) {
         return new Location(
                 locationCreateDTO.getLatitude(),
-                locationCreateDTO.getLongitude(),
-                locationCreateDTO.getUserId()
+                locationCreateDTO.getLongitude()
         );
     }
 }

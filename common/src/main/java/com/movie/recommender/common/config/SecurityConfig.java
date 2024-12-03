@@ -32,7 +32,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/users/register",
                                 "/api/v1/users/login",
-                                "api/v1/locations/countries/cities").permitAll()
+                                "api/v1/locations/countries/cities",
+                                "api/v1/internal/crawl",
+                                "api/v1/recommend").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -30,8 +30,7 @@ public class LocationController {
     public ResponseEntity<LocationDTO> createLocation(
             @AuthenticationPrincipal CustomPrincipal principal,
             @RequestBody @Valid LocationCreateDTO locationCreateDTO) {
-        locationCreateDTO.setUserId(principal.getUserId());
-        LocationDTO savedLocation = locationService.saveLocation(locationCreateDTO);
+        LocationDTO savedLocation = locationService.saveLocation(principal.getUserId(), locationCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLocation);
     }
 

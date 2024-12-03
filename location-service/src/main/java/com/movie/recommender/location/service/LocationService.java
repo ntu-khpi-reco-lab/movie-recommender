@@ -84,12 +84,13 @@ public class LocationService {
     }
 
     @Transactional
-    public LocationDTO saveLocation(LocationCreateDTO locationCreateDTO) {
+    public LocationDTO saveLocation(Long userId, LocationCreateDTO locationCreateDTO) {
         log.info("Saving new location for user: {}", locationCreateDTO.getUserId());
         City city = getCityByCoordinates(locationCreateDTO.getLatitude(), locationCreateDTO.getLongitude());
 
         Location location = LocationCreateDTO.toEntity(locationCreateDTO);
         location.setCity(city);
+        location.setUserId(userId);
         Location savedLocation = locationRepository.save(location);
 
         log.info("New location with ID {} was saved for user {}", savedLocation.getId(), locationCreateDTO.getUserId());

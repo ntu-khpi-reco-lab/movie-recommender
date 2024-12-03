@@ -45,7 +45,7 @@ public class RabbitMQConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory factory = new CachingConnectionFactory("localhost");
+        CachingConnectionFactory factory = new CachingConnectionFactory("rabbitmq");
         factory.setUsername("com-movie-recommender-user");
         factory.setPassword("com-movie-recommender-password");
         return factory;

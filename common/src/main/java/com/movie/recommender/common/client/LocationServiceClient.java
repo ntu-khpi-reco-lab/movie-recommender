@@ -4,7 +4,7 @@ import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.common.model.location.LocationDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
@@ -12,6 +12,6 @@ import java.util.List;
 public interface LocationServiceClient {
     @GetMapping("/api/v1/locations/countries/cities")
     List<CountryWithCitiesDTO> getAllCountriesAndCities();
-    @GetMapping("api/v1/locations/users/{userId}")
-    LocationDTO getLocationByUserId(@PathVariable("userId") Long userId);
+    @GetMapping("api/v1/locations/users/")
+    LocationDTO getLocationByUserId(@RequestHeader("Authorization") String token);
 }
