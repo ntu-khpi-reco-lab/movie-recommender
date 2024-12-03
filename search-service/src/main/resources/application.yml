@@ -1,11 +1,6 @@
 server:
   port: 9005  # Search Service running on port 9005
 
-# JWT configuration
-jwt:
-  secret: SecretKey12345
-  expiration: 86400000
-
 spring:
   application:
     name: search-service

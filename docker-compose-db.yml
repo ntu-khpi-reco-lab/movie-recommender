@@ -35,7 +35,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.rabbitmq
-    container_name: rabbitmq-movie-recommender
     ports:
       - "5672:5672"
       - "15672:15672"

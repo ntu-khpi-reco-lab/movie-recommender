@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @Slf4j
 @Service
 public class LocationService {
@@ -85,7 +84,7 @@ public class LocationService {
 
     @Transactional
     public LocationDTO saveLocation(Long userId, LocationCreateDTO locationCreateDTO) {
-        log.info("Saving new location for user: {}", locationCreateDTO.getUserId());
+        log.info("Saving new location for user: {}", userId);
         City city = getCityByCoordinates(locationCreateDTO.getLatitude(), locationCreateDTO.getLongitude());
 
         Location location = LocationCreateDTO.toEntity(locationCreateDTO);
@@ -93,7 +92,7 @@ public class LocationService {
         location.setUserId(userId);
         Location savedLocation = locationRepository.save(location);
 
-        log.info("New location with ID {} was saved for user {}", savedLocation.getId(), locationCreateDTO.getUserId());
+        log.info("New location with ID {} was saved for user {}", savedLocation.getId(), userId);
         return LocationDTOMapper.toDTO(savedLocation);
     }
 

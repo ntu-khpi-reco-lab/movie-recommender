@@ -1,6 +1,5 @@
 package com.movie.recommender.common.security;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,5 +8,4 @@ import lombok.Getter;
 public class CustomPrincipal {
     private final Long userId;
     private final String username;
-
 }

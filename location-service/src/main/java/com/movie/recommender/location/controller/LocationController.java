@@ -1,6 +1,5 @@
 package com.movie.recommender.location.controller;
 
-
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.common.model.location.LocationDTO;
 import com.movie.recommender.common.security.CustomPrincipal;
@@ -14,12 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.Valid;
 import java.util.List;
 
-
 @Slf4j
 @RestController
 @RequestMapping("api/v1/locations")
 public class LocationController {
-
     private final LocationService locationService;
 
     public LocationController(LocationService locationService) {

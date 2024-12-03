@@ -8,11 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-@SpringBootApplication(scanBasePackages = {
-        "com.movie.recommender.common.security",
-        "com.movie.recommender.common.config",
-        "com.movie.recommender.crawler"
-})
+@SpringBootApplication
 @Slf4j
 @EnableAsync
 @EnableFeignClients(basePackages = "com.movie.recommender.common.client")

@@ -66,5 +66,4 @@ public class MongoDBService {
         log.warn("No showtimes found for countryCode: {}, cityName: {}", countryCode, cityName);
         return Collections.emptyMap(); // Return an empty map if no showtimes are found
     }
-
 }

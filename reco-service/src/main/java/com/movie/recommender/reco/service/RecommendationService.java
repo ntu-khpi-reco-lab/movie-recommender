@@ -11,9 +11,9 @@ import com.movie.recommender.common.model.reco.PredictRequest;
 import com.movie.recommender.common.model.reco.PredictResponse;
 import com.movie.recommender.common.model.reco.Prediction;
 import com.movie.recommender.common.model.showtime.Showtime;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,7 +43,6 @@ public class RecommendationService {
     }
 
     public List<MovieWithShowtime> getRecommendations(String token) {
-
         log.info("Starting recommendation process for user");
 
         LocationDTO location = fetchUserLocation(token);
@@ -129,5 +128,4 @@ public class RecommendationService {
         log.info("Fetched {} movies with showtimes", moviesWithShowtimes.size());
         return moviesWithShowtimes;
     }
-
 }

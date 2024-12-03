@@ -23,7 +23,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017
+      uri: mongodb://user:pass@localhost:27017
       database: movieDB
 
 # Docker-specific configuration

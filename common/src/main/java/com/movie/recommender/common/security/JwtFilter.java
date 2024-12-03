@@ -27,16 +27,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-
             if (jwtUtil.isTokenValid(token)) {
                 String username = jwtUtil.extractUsername(token);
                 Long userId = jwtUtil.extractUserId(token);
 
                 CustomPrincipal principal = new CustomPrincipal(userId, username);
-
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         principal, null, null
                 );
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
