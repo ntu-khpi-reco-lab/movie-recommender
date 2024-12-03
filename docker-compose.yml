@@ -140,7 +140,6 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
       - rabbitmq_logs:/var/log/rabbitmq
       - ./config/init.sh:/etc/rabbitmq/init.sh
-
     networks:
       - movie-reco-net
 

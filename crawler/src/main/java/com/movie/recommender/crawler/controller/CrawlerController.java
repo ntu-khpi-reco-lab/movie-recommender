@@ -34,8 +34,6 @@ public class CrawlerController {
             @RequestParam("city") String city) {
 
             ShowtimesByCity showtimes = movieService.getShowtimesByCity(country, city);
-
             return ResponseEntity.ok(showtimes);
     }
-
 }
