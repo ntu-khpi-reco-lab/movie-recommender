@@ -2,7 +2,7 @@ package com.movie.recommender.user.service;
 
 import com.movie.recommender.user.exception.UserAlreadyExistsException;
 import com.movie.recommender.user.model.dto.UserUpdateDTO;
-import com.movie.recommender.user.security.JwtUtil;
+import com.movie.recommender.common.security.JwtUtil;
 import com.movie.recommender.user.exception.UserNotFoundException;
 import com.movie.recommender.user.model.dto.UserCreateDTO;
 import com.movie.recommender.user.model.dto.UserDTO;

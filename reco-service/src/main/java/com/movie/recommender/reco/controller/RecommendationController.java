@@ -1,9 +1,8 @@
 package com.movie.recommender.reco.controller;
 
-import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.reco.MovieWithShowtime;
-import com.movie.recommender.common.model.reco.Prediction;
 import com.movie.recommender.reco.service.RecommendationService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +19,11 @@ public class RecommendationController {
         this.recommendationService = recommendationService;
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<MovieWithShowtime>> recommend(@PathVariable("userId") Long userId) {
+    @GetMapping
+    public ResponseEntity<List<MovieWithShowtime>> recommend(HttpServletRequest request) {
         try {
-            List<MovieWithShowtime> recommendations = recommendationService.getRecommendations(userId);
+            String token = request.getHeader("Authorization");
+            List<MovieWithShowtime> recommendations = recommendationService.getRecommendations(token);
             return ResponseEntity.ok(recommendations);
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,7 +1,6 @@
 package com.movie.recommender.common.config;
 
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import com.movie.recommender.common.model.location.LocationExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import com.movie.recommender.common.model.location.LocationQueue;
@@ -11,11 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.amqp.core.*;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @Configuration
 public class RabbitMQConfig {
-
     public static final String NEW_LOCATION_QUEUE = "location.update.queue";
     public static final String NEW_LOCATION_EXCHANGE = "location.exchange";
     public static final String NEW_LOCATION_ROUTINGKEY = "location.update";
@@ -44,18 +41,9 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory factory = new CachingConnectionFactory("localhost");
-        factory.setUsername("com-movie-recommender-user");
-        factory.setPassword("com-movie-recommender-password");
-        return factory;
-    }
-
-    @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter());
         return template;
     }
 }
-

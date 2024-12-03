@@ -22,7 +22,7 @@ public class SearchController {
     @PostMapping
     public ResponseEntity<Object> findMovies(@Valid @RequestBody SearchFilter filter) {
         try {
-            return  new ResponseEntity<>(searchService.search(filter), HttpStatus.OK) ;
+            return new ResponseEntity<>(searchService.search(filter), HttpStatus.OK) ;
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
