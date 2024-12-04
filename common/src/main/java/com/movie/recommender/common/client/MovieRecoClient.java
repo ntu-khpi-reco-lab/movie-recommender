@@ -22,7 +22,7 @@ public class MovieRecoClient {
     }
 
     public PredictResponse getRecommendations(PredictRequest request) {
-        String url = baseUrl + "/predict";
+        String url = baseUrl + "/recommend";
         log.info("Sending POST request to {}", url);
 
         // Real call to the MovieReco service
