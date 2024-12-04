@@ -1,5 +1,6 @@
 package com.movie.recommender.common.model.movie;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.util.List;
 
@@ -10,6 +11,7 @@ public class MovieDetails {
     private String title;
     private String overview;
     private String releaseDate;
+    @JsonProperty("vote_average")
     private Double rating;
     private Integer runtime;
     private boolean adult;

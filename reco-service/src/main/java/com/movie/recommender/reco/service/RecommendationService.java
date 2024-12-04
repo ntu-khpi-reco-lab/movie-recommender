@@ -26,7 +26,6 @@ public class RecommendationService {
     private final FavoritesClient favoritesClient;
     private final MongoDBService mongoDBService;
     private final MovieRecoClient movieRecoClient;
-    private final String COUNTRY_CODE = "ua";
     @Value("${reco.threshold}")
     private double scoreThreshold;
 
@@ -47,7 +46,7 @@ public class RecommendationService {
 
         LocationDTO location = fetchUserLocation(token);
         Set<Long> favoriteMovies = fetchUserFavoriteMovies(token);
-        List<Long> nowPlayingMovieIds = fetchNowPlayingMovieIds();
+        List<Long> nowPlayingMovieIds = fetchNowPlayingMovieIds(location.getCountryName());
 
         PredictRequest predictRequest = createPredictRequest(favoriteMovies, nowPlayingMovieIds);
         PredictResponse predictResponse = fetchPredictions(predictRequest);
@@ -69,9 +68,9 @@ public class RecommendationService {
         return favoritesClient.getFavoriteMovies(token);
     }
 
-    private List<Long> fetchNowPlayingMovieIds() {
-        log.info("Fetching now playing movies for country code: {}", COUNTRY_CODE);
-        List<NowPlayingMoviesByCountry> nowPlayingMovies = mongoDBService.getNowPlayingMoviesByCountry(COUNTRY_CODE);
+    private List<Long> fetchNowPlayingMovieIds(String countryName) {
+        log.info("Fetching now playing movies for country code: {}", countryName);
+        List<NowPlayingMoviesByCountry> nowPlayingMovies = mongoDBService.getNowPlayingMoviesByCountry(countryName);
         return nowPlayingMovies.stream()
                 .flatMap(country -> country.getResults().stream())
                 .map(NowPlayingMoviesByCountry.MovieIdentifier::getId)
@@ -106,7 +105,7 @@ public class RecommendationService {
 
         // Fetch all showtimes for the given movie IDs in the user's city
         Map<Long, List<Showtime>> showtimesMap = mongoDBService.getMovieShowtimesByCity(
-                COUNTRY_CODE,
+                location.getCountryName(),
                 location.getCityName(),
                 movieIds
         );
