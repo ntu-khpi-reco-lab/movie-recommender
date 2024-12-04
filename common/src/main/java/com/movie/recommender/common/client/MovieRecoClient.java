@@ -3,6 +3,7 @@ package com.movie.recommender.common.client;
 import com.movie.recommender.common.model.reco.PredictRequest;
 import com.movie.recommender.common.model.reco.PredictResponse;
 import com.movie.recommender.common.model.reco.Prediction;
+import com.movie.recommender.common.model.reco.TrainResponse;
 import com.movie.recommender.lib.http.HttpClient;
 import com.movie.recommender.lib.http.auth.NoAuthProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,16 @@ public class MovieRecoClient {
 
         log.info("Received response from MovieReco service: {}", predictResponse);
         return predictResponse;
+    }
+
+    public void retrain() {
+        String url = baseUrl + "/train";
+        log.info("Sending POST request to {}", url);
+
+        // Real call to the MovieReco service
+        // httpClient.post(url, null, TrainResponse.class);
+
+        log.info("Retraining request sent to MovieReco service");
     }
 
     private String getMovieRecoUrl() {

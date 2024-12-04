@@ -1,6 +1,7 @@
 package com.movie.recommender.crawler.service;
 
 import com.movie.recommender.common.client.LocationServiceClient;
+import com.movie.recommender.common.client.MovieRecoClient;
 import com.movie.recommender.common.model.location.CountryWithCitiesDTO;
 import com.movie.recommender.common.model.movie.MovieDetails;
 import com.movie.recommender.common.model.movie.NowPlayingMoviesByCountry;
@@ -21,10 +22,15 @@ public class MovieService {
     private final TmdbApiClient tmdbApiClient;
     private final SerpApiClient serpApiClient;
     private final MongoDBService mongoDBService;
+    private final MovieRecoClient movieRecoClient;
+
     private static final int API_CALL_LIMIT = 3;
 
-    public MovieService(LocationServiceClient locationServiceClient, MongoDBService mongoDBService) {
+    public MovieService(LocationServiceClient locationServiceClient,
+                        MongoDBService mongoDBService,
+                        MovieRecoClient movieRecoClient) {
         this.locationServiceClient = locationServiceClient;
+        this.movieRecoClient = movieRecoClient;
         this.tmdbApiClient = new TmdbApiClient();
         this.serpApiClient = new SerpApiClient();
         this.mongoDBService = mongoDBService;
@@ -48,6 +54,8 @@ public class MovieService {
                 processCountryShowtimes(country, countryCode, movies);
             }
         }
+        // Retrain the recommendation model after adding new movies
+        movieRecoClient.retrain();
     }
 
     private NowPlayingMoviesByCountry fetchNowPlayingMoviesForCountry(String countryCode,String countryName) {
