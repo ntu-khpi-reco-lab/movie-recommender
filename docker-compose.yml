@@ -76,7 +76,7 @@ services:
       context: .
       dockerfile: ./reco-service/Dockerfile
     environment:
-      MOVIE_RECO_BASE_URL: http://localhost:9007
+      MOVIE_RECO_BASE_URL: http://localhost:5002
     ports:
       - "9006:9006"
     networks:
