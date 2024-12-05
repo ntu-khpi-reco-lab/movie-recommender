@@ -26,12 +26,7 @@ public class MovieRecoClient {
         String url = baseUrl + "/recommend";
         log.info("Sending POST request to {}", url);
 
-        // Real call to the MovieReco service
-        // PredictResponse predictResponse = httpClient.post(url, request, PredictResponse.class);
-
-        // For testing purposes
-        // Simulate the response from the MovieReco service by generating random predictions
-        PredictResponse predictResponse = mockResponse(request);
+         PredictResponse predictResponse = httpClient.post(url, request, PredictResponse.class);
 
         log.info("Received response from MovieReco service: {}", predictResponse);
         return predictResponse;
@@ -41,8 +36,7 @@ public class MovieRecoClient {
         String url = baseUrl + "/train";
         log.info("Sending POST request to {}", url);
 
-        // Real call to the MovieReco service
-        // httpClient.post(url, null, TrainResponse.class);
+         httpClient.post(url, null, TrainResponse.class);
 
         log.info("Retraining request sent to MovieReco service");
     }
@@ -54,20 +48,5 @@ public class MovieRecoClient {
             throw new IllegalStateException("MOVIE_RECO_BASE_URL environment variable is not set");
         }
         return baseUrl;
-    }
-
-    // For testing purposes
-    // Simulate the response from the MovieReco service by generating random predictions
-    // Will be deleted in the final version
-    private PredictResponse mockResponse(PredictRequest request) {
-        PredictResponse response = new PredictResponse();
-        // Ensure the list is initialized
-        if (response.getPredictions() == null) {
-            response.setPredictions(new ArrayList<>());
-        }
-        for (Long movieId : request.getMovieIds()) {
-            response.getPredictions().add(new Prediction(movieId, Math.random()));
-        }
-        return response;
     }
 }
