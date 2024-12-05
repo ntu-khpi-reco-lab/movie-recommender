@@ -26,12 +26,12 @@ public class MongoDBService {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public List<NowPlayingMoviesByCountry> getNowPlayingMoviesByCountry(String countryCode) {
+    public List<NowPlayingMoviesByCountry> getNowPlayingMoviesByCountry(String countryName) {
         try {
-            Query query = new Query(Criteria.where("countryCode").is(countryCode));
+            Query query = new Query(Criteria.where("countryName").is(countryName));
             return mongoTemplate.find(query, NowPlayingMoviesByCountry.class, NOW_PLAYING_COLLECTION);
         } catch (MongoException e) {
-            log.error("Error fetching now playing movies for country '{}': {}", countryCode, e.getMessage(), e);
+            log.error("Error fetching now playing movies for country '{}': {}", countryName, e.getMessage(), e);
             return List.of();
         }
     }
@@ -41,30 +41,29 @@ public class MongoDBService {
         return mongoTemplate.findOne(query, MovieDetails.class);
     }
 
-    public Map<Long, List<Showtime>> getMovieShowtimesByCity(String countryCode, String cityName, List<Long> movieIds) {
-        log.info("Fetching showtimes for countryCode: {}, cityName: {}, movieIds: {}", countryCode, cityName, movieIds);
+    public Map<Long, List<Showtime>> getMovieShowtimesByCity(String countryName, String cityName, List<Long> movieIds) {
+        log.info("Fetching showtimes for countryCode: {}, cityName: {}, movieIds: {}", countryName, cityName, movieIds);
 
         // Build the query with countryCode and cityName
-        Query query = new Query(Criteria.where("countryCode").is(countryCode)
+        Query query = new Query(Criteria.where("countryName").is(countryName)
                 .and("cityName").is(cityName));
 
         // Fetch the matching ShowtimesByCity record
         ShowtimesByCity showtimesByCity = mongoTemplate.findOne(query, ShowtimesByCity.class, "ShowtimesByCity");
 
-        if (showtimesByCity != null) {
-            log.info("ShowtimesByCity record found for countryCode: {}, cityName: {}", countryCode, cityName);
+        if (showtimesByCity != null && showtimesByCity.getMovies() != null) {
+            log.info("ShowtimesByCity record found for countryCode: {}, cityName: {}", countryName, cityName);
 
-            // Create a map of movieId to showtimes
+            // Create a map of movieId to showtimes, adding null checks
             return showtimesByCity.getMovies().stream()
-                    .filter(movie -> movieIds.contains(movie.getId())) // Only include requested movie IDs
+                    .filter(movie -> movie != null && movie.getId() != null && movieIds.contains(movie.getId())) // Check for null movie and id
                     .collect(Collectors.toMap(
-                            ShowtimesByCity.MovieShowtimes::getId,
-                            ShowtimesByCity.MovieShowtimes::getShowtimes
+                            movie -> movie.getId(), // Get movie ID
+                            movie -> movie.getShowtimes() != null ? movie.getShowtimes() : Collections.emptyList() // Handle null showtimes
                     ));
+        } else {
+            log.warn("No ShowtimesByCity record found for countryCode: {}, cityName: {}", cityName, cityName);
+            return Collections.emptyMap();
         }
-
-        log.warn("No showtimes found for countryCode: {}, cityName: {}", countryCode, cityName);
-        return Collections.emptyMap(); // Return an empty map if no showtimes are found
     }
-
 }

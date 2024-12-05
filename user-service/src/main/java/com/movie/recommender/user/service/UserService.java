@@ -2,7 +2,7 @@ package com.movie.recommender.user.service;
 
 import com.movie.recommender.user.exception.UserAlreadyExistsException;
 import com.movie.recommender.user.model.dto.UserUpdateDTO;
-import com.movie.recommender.user.security.JwtUtil;
+import com.movie.recommender.common.security.JwtUtil;
 import com.movie.recommender.user.exception.UserNotFoundException;
 import com.movie.recommender.user.model.dto.UserCreateDTO;
 import com.movie.recommender.user.model.dto.UserDTO;
@@ -11,7 +11,6 @@ import com.movie.recommender.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 @Service
 @Slf4j
@@ -49,7 +48,7 @@ public class UserService {
 
         if (passwordEncoder.matches(password, user.getPassword())) {
             log.info("Login successful for username: {}", username);
-            return jwtUtil.generateToken(username);
+            return jwtUtil.generateToken(username, user.getId());
         } else {
             log.warn("Login failed: Invalid credentials for username {}", username);
             throw new IllegalArgumentException("Invalid credentials");

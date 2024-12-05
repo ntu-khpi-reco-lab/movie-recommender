@@ -1,5 +1,6 @@
 package com.movie.recommender.crawler.controller;
 
+import com.movie.recommender.common.model.showtime.ShowtimesByCity;
 import com.movie.recommender.crawler.service.MovieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,5 +26,14 @@ public class CrawlerController {
             log.error("Error during crawl process: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body("An error occurred during the crawl process.");
         }
+    }
+
+    @GetMapping("/showtimes")
+    public ResponseEntity<ShowtimesByCity> getShowtimesByLocation(
+            @RequestParam("country") String country,
+            @RequestParam("city") String city) {
+
+            ShowtimesByCity showtimes = movieService.getShowtimesByCity(country, city);
+            return ResponseEntity.ok(showtimes);
     }
 }

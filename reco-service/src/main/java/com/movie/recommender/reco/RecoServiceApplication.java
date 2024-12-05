@@ -4,12 +4,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@SpringBootApplication(
-        scanBasePackages = {
-                "com.movie.recommender.common.client",
-                "com.movie.recommender.reco"
-        }
-)
+@SpringBootApplication(scanBasePackages = {
+        "com.movie.recommender.common.security",
+        "com.movie.recommender.common.config",
+        "com.movie.recommender.common.client",
+        "com.movie.recommender.reco"
+})
 @EnableFeignClients(basePackages = {
         "com.movie.recommender.common.client"
 })

@@ -12,7 +12,7 @@ fi
 rabbitmqctl wait /var/lib/rabbitmq/mnesia/rabbitmq\@$(hostname)
 
 # Declare the exchange
-rabbitmqadmin -u com-movie-recommender-user -p com-movie-recommender-password  declare exchange name=location.exchange type=direct
+rabbitmqadmin -u com-movie-recommender-user -p com-movie-recommender-password  declare exchange name=location.exchange type=topic
 
 # Declare the queue
 rabbitmqadmin -u com-movie-recommender-user -p com-movie-recommender-password  declare queue name=location.update.queue durable=true

@@ -11,12 +11,9 @@ import com.movie.recommender.common.model.reco.PredictRequest;
 import com.movie.recommender.common.model.reco.PredictResponse;
 import com.movie.recommender.common.model.reco.Prediction;
 import com.movie.recommender.common.model.showtime.Showtime;
-import com.movie.recommender.common.model.showtime.ShowtimesByCity;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,7 +26,6 @@ public class RecommendationService {
     private final FavoritesClient favoritesClient;
     private final MongoDBService mongoDBService;
     private final MovieRecoClient movieRecoClient;
-    private final String COUNTRY_CODE = "ua";
     @Value("${reco.threshold}")
     private double scoreThreshold;
 
@@ -45,12 +41,12 @@ public class RecommendationService {
         this.movieRecoClient = movieRecoClient;
     }
 
-    public List<MovieWithShowtime> getRecommendations(Long userId) {
-        log.info("Starting recommendation process for user ID: {}", userId);
+    public List<MovieWithShowtime> getRecommendations(String token) {
+        log.info("Starting recommendation process for user");
 
-        LocationDTO location = fetchUserLocation(userId);
-        Set<Long> favoriteMovies = fetchUserFavoriteMovies(userId);
-        List<Long> nowPlayingMovieIds = fetchNowPlayingMovieIds();
+        LocationDTO location = fetchUserLocation(token);
+        Set<Long> favoriteMovies = fetchUserFavoriteMovies(token);
+        List<Long> nowPlayingMovieIds = fetchNowPlayingMovieIds(location.getCountryName());
 
         PredictRequest predictRequest = createPredictRequest(favoriteMovies, nowPlayingMovieIds);
         PredictResponse predictResponse = fetchPredictions(predictRequest);
@@ -62,19 +58,19 @@ public class RecommendationService {
         return fetchMoviesWithShowtimes(filteredMovieIds,location);
     }
 
-    private LocationDTO fetchUserLocation(Long userId) {
-        log.info("Fetching location for user ID: {}", userId);
-        return locationClient.getLocationByUserId(userId);
+    private LocationDTO fetchUserLocation(String token) {
+        log.info("Fetching location for user ID");
+        return locationClient.getLocationByUserId(token);
     }
 
-    private Set<Long> fetchUserFavoriteMovies(Long userId) {
-        log.info("Fetching favorite movies for user ID: {}", userId);
-        return favoritesClient.getFavoriteMovies(userId);
+    private Set<Long> fetchUserFavoriteMovies(String token) {
+        log.info("Fetching favorite movies for user");
+        return favoritesClient.getFavoriteMovies(token);
     }
 
-    private List<Long> fetchNowPlayingMovieIds() {
-        log.info("Fetching now playing movies for country code: {}", COUNTRY_CODE);
-        List<NowPlayingMoviesByCountry> nowPlayingMovies = mongoDBService.getNowPlayingMoviesByCountry(COUNTRY_CODE);
+    private List<Long> fetchNowPlayingMovieIds(String countryName) {
+        log.info("Fetching now playing movies for country code: {}", countryName);
+        List<NowPlayingMoviesByCountry> nowPlayingMovies = mongoDBService.getNowPlayingMoviesByCountry(countryName);
         return nowPlayingMovies.stream()
                 .flatMap(country -> country.getResults().stream())
                 .map(NowPlayingMoviesByCountry.MovieIdentifier::getId)
@@ -109,7 +105,7 @@ public class RecommendationService {
 
         // Fetch all showtimes for the given movie IDs in the user's city
         Map<Long, List<Showtime>> showtimesMap = mongoDBService.getMovieShowtimesByCity(
-                COUNTRY_CODE,
+                location.getCountryName(),
                 location.getCityName(),
                 movieIds
         );
@@ -131,5 +127,4 @@ public class RecommendationService {
         log.info("Fetched {} movies with showtimes", moviesWithShowtimes.size());
         return moviesWithShowtimes;
     }
-
 }

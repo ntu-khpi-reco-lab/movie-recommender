@@ -1,10 +1,12 @@
 package com.movie.recommender.user.controller;
 
 import com.movie.recommender.user.model.dto.*;
+import com.movie.recommender.common.security.CustomPrincipal;
 import com.movie.recommender.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,21 +31,23 @@ public class UserController {
         return ResponseEntity.ok(token);
     }
 
-    @GetMapping("/{userId}/profile")
-    public ResponseEntity<UserDTO> getUserProfile(@PathVariable("userId") Long userId) {
-        UserDTO userDTO = userService.getUserProfile(userId);
+    @GetMapping("/profile")
+    public ResponseEntity<UserDTO> getUserProfile(@AuthenticationPrincipal CustomPrincipal principal) {
+        UserDTO userDTO = userService.getUserProfile(principal.getUserId());
         return ResponseEntity.ok(userDTO);
     }
 
-    @PutMapping("/{userId}/profile")
-    public ResponseEntity<UserDTO> updateUserProfile(@PathVariable("userId") Long userId, @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
-        UserDTO userDTO = userService.updateUserProfile(userId, userUpdateDTO);
+    @PutMapping("/profile")
+    public ResponseEntity<UserDTO> updateUserProfile(
+            @AuthenticationPrincipal CustomPrincipal principal,
+            @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+        UserDTO userDTO = userService.updateUserProfile(principal.getUserId(), userUpdateDTO);
         return ResponseEntity.ok(userDTO);
     }
 
-    @DeleteMapping("/{userId}/profile")
-    public ResponseEntity<Void> deleteUserProfile(@PathVariable("userId") Long userId) {
-        userService.deleteUserProfile(userId);
+    @DeleteMapping("/profile")
+    public ResponseEntity<Void> deleteUserProfile(@AuthenticationPrincipal CustomPrincipal principal) {
+        userService.deleteUserProfile(principal.getUserId());
         return ResponseEntity.noContent().build();
     }
 }

@@ -34,7 +34,7 @@ public class HttpClient {
     }
 
     public <T> T post(String url, Object body, Class<T> tClass) {
-        String jsonBody = serializeRequestBody(body);
+        String jsonBody = body != null ? serializeRequestBody(body) : null;
         Request request = buildRequest(url, null, "POST", jsonBody);
         return executeRequest(request, tClass);
     }
@@ -48,9 +48,13 @@ public class HttpClient {
         authProvider.applyAuth(requestBuilder, urlBuilder);
 
         Request.Builder finalRequestBuilder = requestBuilder.url(urlBuilder.build());
-        if ("POST".equalsIgnoreCase(method) && jsonBody != null) {
-            finalRequestBuilder.post(okhttp3.RequestBody.create(jsonBody, okhttp3.MediaType.parse("application/json")));
+        if ("POST".equalsIgnoreCase(method)) {
+            okhttp3.RequestBody requestBody = jsonBody != null
+                    ? okhttp3.RequestBody.create(jsonBody, okhttp3.MediaType.parse("application/json"))
+                    : okhttp3.RequestBody.create("{}", okhttp3.MediaType.parse("application/json"));
+            finalRequestBuilder.post(requestBody);
         }
+
         return finalRequestBuilder.build();
     }
 
@@ -63,7 +67,7 @@ public class HttpClient {
                 throw new IOException("Response body is null");
             }
             return objectMapper.readValue(response.body().string(), tClass);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to execute request", e);
         }
     }

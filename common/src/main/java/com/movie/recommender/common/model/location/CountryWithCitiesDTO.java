@@ -13,6 +13,8 @@ import java.util.List;
 public class CountryWithCitiesDTO {
     @JsonProperty("countryName")
     private String countryName;
+    @JsonProperty("cities")
     private List<String> cities;
+    @JsonProperty("countryCode")
     private String countryCode;
 }
