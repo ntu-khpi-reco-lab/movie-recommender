@@ -36,8 +36,7 @@ public class MovieRecoClient {
         String url = baseUrl + "/train";
         log.info("Sending POST request to {}", url);
 
-        // Real call to the MovieReco service
-        // httpClient.post(url, null, TrainResponse.class);
+         httpClient.post(url, null, TrainResponse.class);
 
         log.info("Retraining request sent to MovieReco service");
     }
